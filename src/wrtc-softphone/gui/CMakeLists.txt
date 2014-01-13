@@ -1,6 +1,5 @@
-# Top-level CMakeLists.txt for Melange
+# Gui CMakeLists.txt for wrtc-softphone
 #
-# Copyright 2014 Fedor Lyakhov <fedor.lyakhov@gmail.com>
 # Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
 #
 # This file is part of Melange.
@@ -19,14 +18,16 @@
 # along with Melange.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required (VERSION 2.8)
+project (wrtc-softphone)
 
-project(melange) # Use CMAKE_PROJECT_NAME to get this name
+set (gui_source 
+	main.cpp
+	MainWindow.cpp
+	)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/src/cmake)
+FIND_PACKAGE(Qt4 REQUIRED)
 
-set(GST_AUDIOPLAYER_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer)
-set(GST_AUDIOPLAYER_LOCAL_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer/local)
-set(WRTC_SOFTPHONE_ROOT ${PROJECT_SOURCE_DIR}/srs/wrtc-softphone)
+INCLUDE(${QT_USE_FILE})
 
-add_subdirectory(${GST_AUDIOPLAYER_LOCAL_ROOT})
-add_subdirectory(${WRTC_SOFTPHONE_ROOT})
+add_executable (wrtc-softphone ${gui_source})
+TARGET_LINK_LIBRARIES(wrtc-softphone ${QT_LIBRARIES})
