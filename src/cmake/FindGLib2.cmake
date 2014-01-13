@@ -66,49 +66,49 @@ pkg_check_modules(PC_GLIB2 QUIET glib-2.0)
 set(GLIB2_DEFINITIONS ${PC_GLIB2_CFLAGS_OTHER})
 
 find_path(GLIB2_INCLUDE_DIRS NAMES glib.h
-    HINTS
-    ${PC_GLIB2_INCLUDEDIR}
-    ${PC_GLIB2_INCLUDE_DIRS}
-    PATHS
-    /usr/local/include
-    /usr/include
-    PATH_SUFFIXES glib-2.0
-    )
+	HINTS
+	${PC_GLIB2_INCLUDEDIR}
+	${PC_GLIB2_INCLUDE_DIRS}
+	PATHS
+	/usr/local/include
+	/usr/include
+	PATH_SUFFIXES glib-2.0
+	)
 find_path(GLIB2_CONFIG_DIR NAMES glibconfig.h
-    HINTS
-    ${PC_GLIB2_INCLUDEDIR}
-    ${PC_GLIB2_INCLUDE_DIRS}
-    ${PC_GLIB2_LIBDIR}
-    ${PC_GLIB2_LIBRARY_DIRS}
-    PATHS
-    /usr/local/lib64
-    /usr/local/lib
-    /usr/lib64
-    /usr/lib
-    PATH_SUFFIXES glib-2.0
-    )
+	HINTS
+	${PC_GLIB2_INCLUDEDIR}
+	${PC_GLIB2_INCLUDE_DIRS}
+	${PC_GLIB2_LIBDIR}
+	${PC_GLIB2_LIBRARY_DIRS}
+	PATHS
+	/usr/local/lib64
+	/usr/local/lib
+	/usr/lib64
+	/usr/lib
+	PATH_SUFFIXES glib-2.0
+	)
 set(GLIB2_INCLUDE_DIRS ${GLIB2_INCLUDE_DIRS} ${GLIB2_CONFIG_DIR})
 
 find_library(GLIB2_LIBRARIES NAMES glib-2.0 libglib-2.0
-    HINTS
-    ${PC_GLIB2_LIBDIR}
-    ${PC_GLIB2_LIBRARY_DIRS}
-    PATHS
-    /usr/local/lib64
-    /usr/local/lib
-    /usr/lib64
-    /usr/lib
-    )
+	HINTS
+	${PC_GLIB2_LIBDIR}
+	${PC_GLIB2_LIBRARY_DIRS}
+	PATHS
+	/usr/local/lib64
+	/usr/local/lib
+	/usr/lib64
+	/usr/lib
+	)
 find_library(GOBJECT2_LIBRARIES NAMES gobject-2.0 libgobject-2.0
-    HINTS
-    ${PC_GLIB2_LIBDIR}
-    ${PC_GLIB2_LIBRARY_DIRS}
-    PATHS
-    /usr/local/lib64
-    /usr/local/lib
-    /usr/lib64
-    /usr/lib
-    )
+	HINTS
+	${PC_GLIB2_LIBDIR}
+	${PC_GLIB2_LIBRARY_DIRS}
+	PATHS
+	/usr/local/lib64
+	/usr/local/lib
+	/usr/lib64
+	/usr/lib
+	)
 set(GLIB2_LIBRARIES ${GLIB2_LIBRARIES} ${GOBJECT2_LIBRARIES})
 
 set(GLIB2_VERSION_STRING ${PC_GLIB2_VERSION})
@@ -117,7 +117,7 @@ set(GLIB2_VERSION_STRING ${PC_GLIB2_VERSION})
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GLib2
-                                  REQUIRED_VARS GLIB2_LIBRARIES GLIB2_INCLUDE_DIRS
-                                  VERSION_VAR GLIB2_VERSION_STRING)
+	REQUIRED_VARS GLIB2_LIBRARIES GLIB2_INCLUDE_DIRS
+	VERSION_VAR GLIB2_VERSION_STRING)
 
 mark_as_advanced(GLIB2_INCLUDE_DIRS GLIB2_LIBRARIES)

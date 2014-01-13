@@ -66,24 +66,24 @@ pkg_check_modules(PC_GSTREAMER QUIET gstreamer-1.0)
 set(GSTREAMER_DEFINITIONS ${PC_GSTREAMER_CFLAGS_OTHER})
 
 find_path(GSTREAMER_INCLUDE_DIRS NAMES gst/gst.h
-    HINTS
-    ${PC_GSTREAMER_INCLUDEDIR}
-    ${PC_GSTREAMER_INCLUDE_DIRS}
-    PATHS
-    /usr/include/gstreamer-1.0
-    PATH_SUFFIXES gst
-    )
+	HINTS
+	${PC_GSTREAMER_INCLUDEDIR}
+	${PC_GSTREAMER_INCLUDE_DIRS}
+	PATHS
+	/usr/include/gstreamer-1.0
+	PATH_SUFFIXES gst
+	)
 
 find_library(GSTREAMER_LIBRARIES NAMES gstreamer-1.0 libgstreamer-1.0
-    HINTS
-    ${PC_GSTREAMER_LIBDIR}
-    ${PC_GSTREAMER_LIBRARY_DIRS}
-    PATHS
-    /usr/local/lib64
-    /usr/local/lib
-    /usr/lib64
-    /usr/lib
-    )
+	HINTS
+	${PC_GSTREAMER_LIBDIR}
+	${PC_GSTREAMER_LIBRARY_DIRS}
+	PATHS
+	/usr/local/lib64
+	/usr/local/lib
+	/usr/lib64
+	/usr/lib
+	)
 
 set(GSTREAMER_VERSION_STRING ${PC_GSTREAMER_VERSION})
 
@@ -91,7 +91,7 @@ set(GSTREAMER_VERSION_STRING ${PC_GSTREAMER_VERSION})
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GStreamer
-                                  REQUIRED_VARS GSTREAMER_LIBRARIES GSTREAMER_INCLUDE_DIRS
-                                  VERSION_VAR GSTREAMER_VERSION_STRING)
+	REQUIRED_VARS GSTREAMER_LIBRARIES GSTREAMER_INCLUDE_DIRS
+	VERSION_VAR GSTREAMER_VERSION_STRING)
 
 mark_as_advanced(GSTREAMER_INCLUDE_DIRS GSTREAMER_LIBRARIES)
