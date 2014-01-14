@@ -18,7 +18,22 @@
 # along with Melange.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required (VERSION 2.8)
+project (wrtc-softphone)
 
-set(GUI_ROOT ${PROJECT_SOURCE_DIR}/gui)
+set(Application_SOURCES
+	main.cpp
+	AudioAdaptor.cpp
+	MainWindow.cpp
+	)
+	
+find_package(Qt4 REQUIRED)
 
-add_subdirectory (${GUI_ROOT})
+INCLUDE(${QT_USE_FILE})
+
+set(WebrtcBuild_ROOT ${PROJECT_SOURCE_DIR}/WebrtcBuild)
+add_subdirectory(${WebrtcBuild_ROOT})
+
+add_executable(wrtc-softphone ${Application_SOURCES})
+target_link_libraries(wrtc-softphone ${QT_LIBRARIES})
+
+add_dependencies(wrtc-softphone wrtcbuild)
