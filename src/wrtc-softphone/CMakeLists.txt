@@ -30,10 +30,15 @@ find_package(Qt4 REQUIRED)
 
 INCLUDE(${QT_USE_FILE})
 
-set(WebrtcBuild_ROOT ${PROJECT_SOURCE_DIR}/WebrtcBuild)
-add_subdirectory(${WebrtcBuild_ROOT})
+include_directories(
+	${PROJECT_SOURCE_DIR}/../../third_party/webrtc/webrtc/voice_engine/include
+	${PROJECT_SOURCE_DIR}/../../third_party/webrtc
+	)
+
+set(WebrtcBuild_ROOT ${PROJECT_SOURCE_DIR}/../webrtc-build)
+add_subdirectory(${WebrtcBuild_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/wrtcbuild")
 
 add_executable(wrtc-softphone ${Application_SOURCES})
-target_link_libraries(wrtc-softphone ${QT_LIBRARIES})
+target_link_libraries(wrtc-softphone ${QT_LIBRARIES} wrtcbuild pthread)
 
 add_dependencies(wrtc-softphone wrtcbuild)

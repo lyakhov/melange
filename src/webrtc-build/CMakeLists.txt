@@ -19,6 +19,8 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+project(wrtcbuild)
+
 set(wrtc_ROOT ${PROJECT_SOURCE_DIR}/../../third_party/webrtc)
 
 set(wrtc_SOURCES
@@ -26,7 +28,6 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/voice_engine/channel.cc
 	${wrtc_ROOT}/webrtc/voice_engine/channel_manager.cc
 	${wrtc_ROOT}/webrtc/voice_engine/voe_base_impl.cc
-	${wrtc_ROOT}/webrtc/voice_engine/level_indicator.cc
 	${wrtc_ROOT}/webrtc/voice_engine/monitor_module.cc
 	${wrtc_ROOT}/webrtc/voice_engine/output_mixer.cc
 	${wrtc_ROOT}/webrtc/voice_engine/output_mixer_internal.cc
@@ -39,6 +40,8 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/voice_engine/voe_call_report_impl.cc
 	${wrtc_ROOT}/webrtc/voice_engine/voe_codec_impl.cc
 	${wrtc_ROOT}/webrtc/voice_engine/voe_dtmf_impl.cc
+	${wrtc_ROOT}/webrtc/voice_engine/dtmf_inband.cc
+	${wrtc_ROOT}/webrtc/voice_engine/dtmf_inband_queue.cc
 	${wrtc_ROOT}/webrtc/voice_engine/voe_encryption_impl.cc
 	${wrtc_ROOT}/webrtc/voice_engine/voe_external_media_impl.cc
 	${wrtc_ROOT}/webrtc/voice_engine/voe_file_impl.cc
@@ -55,6 +58,7 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/common_audio/resampler/push_sinc_resampler.cc
 	${wrtc_ROOT}/webrtc/common_audio/resampler/resampler.cc
 	${wrtc_ROOT}/webrtc/common_audio/resampler/sinc_resampler.cc
+	${wrtc_ROOT}/webrtc/common_audio/resampler/sinc_resampler_sse.cc
 	${wrtc_ROOT}/webrtc/common_audio/resampler/sinusoidal_linear_chirp_source.cc
 	${wrtc_ROOT}/webrtc/common_audio/signal_processing/auto_corr_to_refl_coef.c
 	${wrtc_ROOT}/webrtc/common_audio/signal_processing/auto_correlation.c
@@ -128,6 +132,7 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq/automode.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq/codec_db.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq/dsp.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq/dsp_helpfunctions.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq/mix_voice_unvoice.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/main/acm2/acm_g7291.cc
 	${wrtc_ROOT}/webrtc/modules/audio_coding/main/acm2/acm_celt.cc
@@ -182,41 +187,43 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_coding/main/source/acm_pcm16b.cc
 	${wrtc_ROOT}/webrtc/modules/audio_coding/main/source/audio_coding_module_impl.cc
 	${wrtc_ROOT}/webrtc/modules/audio_coding/main/source/acm_pcmu.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_decoder_impl.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_decoder.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/comfort_noise.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/payload_splitter.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/expand.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/background_noise.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/packet_buffer.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/normal.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/neteq_impl.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_multi_vector.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/delay_manager.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/neteq.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/dtmf_buffer.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/buffer_level_filter.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/post_decode_vad.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/statistics_calculator.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decoder_database.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_vector.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/timestamp_scaler.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/preemptive_expand.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/merge.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/rtcp.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/audio_loop.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/rtp_generator.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/input_audio_file.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_decoder_impl.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_decoder.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/comfort_noise.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/payload_splitter.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/expand.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/background_noise.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/packet_buffer.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/normal.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/neteq_impl.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_multi_vector.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/delay_manager.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/neteq.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/dtmf_buffer.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/buffer_level_filter.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/post_decode_vad.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/statistics_calculator.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decoder_database.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/audio_vector.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/timestamp_scaler.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/preemptive_expand.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/merge.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/rtcp.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/audio_loop.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/rtp_generator.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/input_audio_file.cc
 	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/neteq_rtpplay.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/neteq_performance_test.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decision_logic_normal.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decision_logic_fax.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/accelerate.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/random_vector.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/delay_peak_detector.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decision_logic.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/dtmf_tone_generator.cc
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/sync_buffer.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/time_stretch.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/dsp_helper.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/tools/neteq_performance_test.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decision_logic_normal.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decision_logic_fax.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/accelerate.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/random_vector.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/delay_peak_detector.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/decision_logic.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/dtmf_tone_generator.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/neteq4/sync_buffer.cc
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/g722/g722_encode.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/g722/g722_interface.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/g722/g722_decode.c
@@ -225,102 +232,138 @@ set(wrtc_SOURCES
 	#${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/opus/opus_interface.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/cng/webrtc_cng.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/pcm16b/pcm16b.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/util/utility.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/encode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/spectrum_ar_model_tables.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/isac.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/fft.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/filter_functions.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/filterbank_tables.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/decode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_analysis.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/entropy_coding.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/transform.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_tables.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/encode_lpc_swb.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/intialize.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/crc.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_gain_swb_tables.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lattice.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/filterbanks.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/decode_bwe.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/encode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/spectrum_ar_model_tables.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lpc_masking_model.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/initialize.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/fft.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/filterbank_tables.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/decode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/entropy_coding.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/transform.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lpc_tables.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/decode_plc.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/isacfix.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lattice_c.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lattice.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/filterbanks.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/filters.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/decode_bwe.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/gain_quant.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/do_plc.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_to_lsp.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/filtered_cb_vecs.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/interpolate_samples.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_interpolate_to_poly_enc.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/refiner.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_interpolate_lsf.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/abs_quant.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/abs_quant_loop.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/augmented_cb_corr.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/bw_expand.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_construct.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/encode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_lsf_quant.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/unpack_bits.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/constants.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_mem_energy.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/window32_w32.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/state_construct.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_to_poly.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/get_lsp_poly.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_update_best_index.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/poly_to_lsf.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/decode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/create_augmented_vec.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/frame_classify.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/poly_to_lsp.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_interpolate_to_poly_dec.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/gain_dequant.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/abs_quant.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/abs_quant_loop.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/decoder_interpolate_lsf.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/interpolate.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_lpc_analysis.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/index_conv_enc.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lpc_encode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/my_corr.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/pack_bits.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/get_cd_vec.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/vq3.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/get_sync_seq.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/ilbc.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/split_vq.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_mem_energy_calc.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/decode_residual.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/comp_corr.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/energy_inverse.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsp_to_lsf.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/init_encode.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/vq4.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/xcorr_coef.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_mem_energy_augmentation.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/swap_bytes.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_mem_energy_calc.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_search.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_search_core.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/cb_update_best_index.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/chebyshev.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/comp_corr.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/constants.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/create_augmented_vec.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/decoder_interpolate_lsf.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/decode_residual.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/do_plc.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/energy_inverse.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/enhancer.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/enhancer_interface.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/enh_upsample.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/filtered_cb_vecs.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/frame_classify.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/gain_dequant.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/gain_quant.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/get_cd_vec.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/get_lsp_poly.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/get_sync_seq.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/hp_input.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/hp_output.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/ilbc.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/ilbc_decode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/ilbc_encode.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/index_conv_dec.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_lsf_dequant.c
-	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/sort_sq.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/index_conv_enc.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/init_decode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/init_encode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/interpolate.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/interpolate_samples.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lpc_encode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_check.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_interpolate_to_poly_dec.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_interpolate_to_poly_enc.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_to_lsp.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsf_to_poly.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/lsp_to_lsf.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/my_corr.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/nearest_neighbor.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/pack_bits.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/poly_to_lsf.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/poly_to_lsp.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/refiner.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_interpolate_lsf.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_lpc_analysis.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_lsf_dequant.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/simple_lsf_quant.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/smooth.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/smooth_out_data.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/sort_sq.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/split_vq.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/state_construct.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/state_search.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/swap_bytes.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/unpack_bits.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/vq3.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/vq4.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/window32_w32.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/xcorr_coef.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/arith_routines.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/arith_routines_hist.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/arith_routines_logist.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/bandwidth_estimator.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/decode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/decode_bwe.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/decode_plc.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/encode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/entropy_coding.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/fft.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/filterbanks.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/filterbank_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/filters.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/initialize.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/isacfix.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lattice.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lattice_c.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lpc_masking_model.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/lpc_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/pitch_estimator.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/pitch_filter.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/pitch_filter_c.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/pitch_gain_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/pitch_lag_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/spectrum_ar_model_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/fix/source/transform.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/arith_routines.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/arith_routines_hist.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/arith_routines_logist.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/bandwidth_estimator.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/crc.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/decode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/decode_bwe.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/encode.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/encode_lpc_swb.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/entropy_coding.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/fft.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/filterbanks.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/filterbank_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/filter_functions.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/intialize.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/isac.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lattice.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_analysis.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_gain_swb_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_shape_swb12_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_shape_swb16_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/lpc_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/pitch_estimator.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/pitch_filter.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/pitch_gain_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/pitch_lag_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/spectrum_ar_model_tables.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/source/transform.c
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/util/utility.c
 	${wrtc_ROOT}/webrtc/modules/audio_conference_mixer/source/audio_frame_manipulator.cc
 	${wrtc_ROOT}/webrtc/modules/audio_conference_mixer/source/audio_conference_mixer_impl.cc
+	${wrtc_ROOT}/webrtc/modules/audio_conference_mixer/source/time_scheduler.cc
 	${wrtc_ROOT}/webrtc/modules/audio_conference_mixer/source/level_indicator.cc
+	${wrtc_ROOT}/webrtc/voice_engine/level_indicator.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_impl.cc
+	${wrtc_ROOT}/webrtc/modules/audio_device/dummy/audio_device_dummy.cc
+	${wrtc_ROOT}/webrtc/modules/audio_device/dummy/audio_device_utility_dummy.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/audio_device_utility_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/audio_device_alsa_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/audio_mixer_manager_pulse_linux.cc
@@ -331,6 +374,7 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_buffer.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_generic.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_utility.cc
+	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/cng/cng_helpfuns.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/noise_suppression_impl.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/audio_buffer.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/gain_control_impl.cc
@@ -339,6 +383,7 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_processing/aec/aec_core_sse2.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/aec/aec_resampler.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/aec/aec_rdft_sse2.c
+	${wrtc_ROOT}/webrtc/modules/audio_processing/aec/echo_cancellation.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/agc/digital_agc.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/agc/analog_agc.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/ns/ns_core.c
@@ -347,8 +392,12 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_processing/ns/noise_suppression_x.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/aecm/aecm_core_c.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/aecm/aecm_core.c
+	${wrtc_ROOT}/webrtc/modules/audio_processing/aecm/echo_control_mobile.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/level_estimator_impl.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/voice_detection_impl.cc
+	${wrtc_ROOT}/webrtc/modules/audio_processing/echo_cancellation_impl.cc
+	${wrtc_ROOT}/webrtc/modules/audio_processing/echo_control_mobile_impl.cc
+	${wrtc_ROOT}/webrtc/modules/audio_processing/high_pass_filter_impl.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/ring_buffer.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/fft4g.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/delay_estimator.c
@@ -356,6 +405,76 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/delay_estimator_wrapper.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/audio_processing_impl.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/processing_component.cc
+	${wrtc_ROOT}/webrtc/modules/media_file/source/media_file_impl.cc
+	${wrtc_ROOT}/webrtc/modules/media_file/source/media_file_utility.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtcp_sender.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtcp_utility.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/forward_error_correction.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_receiver_impl.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/fec_receiver_impl.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/producer_fec.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_receiver_video.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_payload_registry.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/forward_error_correction_internal.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_sender_audio.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_receiver_audio.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/dtmf_queue.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_sender.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_sender_video.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/nack_rtx_unittest.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_format_vp8.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/receive_statistics_impl.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/vp8_partition_aggregator.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtcp_receiver.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtcp_receiver_help.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/ssrc_database.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_receiver_strategy.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/H264/bitstream_parser.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/H264/bitstream_builder.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_rtcp_impl.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/bitrate.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_utility.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/tmmbr_help.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_header_extension.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_packet_history.cc
+	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_header_parser.cc
+	${wrtc_ROOT}/webrtc/modules/pacing/paced_sender.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/file_recorder_impl.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/rtp_dump_impl.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/video_frames_queue.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/frame_scaler.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/audio_frame_operations.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/video_coder.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/file_player_impl.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/coder.cc
+	${wrtc_ROOT}/webrtc/modules/utility/source/process_thread_impl.cc
+	#system_wrappers
+	${wrtc_ROOT}/webrtc/system_wrappers/source/thread_posix.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/cpu_features.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/event_posix.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/condition_variable_posix.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/sleep.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/file_impl.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/clock.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/sort.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/tick_util.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/rw_lock_posix.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/critical_section.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/event.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/rw_lock_generic.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/event_tracer.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/logging.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/data_log_c.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/data_log.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/aligned_malloc.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/condition_variable.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/critical_section_posix.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/trace_posix.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/atomic32_posix.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/trace_impl.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/rw_lock.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/cpu_info.cc
+	${wrtc_ROOT}/webrtc/system_wrappers/source/thread.cc
 	)
 	
 include_directories(
