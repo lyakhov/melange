@@ -16,13 +16,10 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
- *
- * This file was derived from helloworld.c test/example of GStreamer framework.
  */
 
 
 #include "MainWindow.h"
-#include "AudioAdaptor.h"
 #include <QApplication>
 
 int main(int argc, char **argv)

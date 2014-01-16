@@ -16,26 +16,31 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
- *
- * This file was derived from helloworld.c test/example of GStreamer framework.
  */
 
 #include "MainWindow.h"
-#include <QVBoxLayout>
 
 MainWindow::MainWindow()
 {
 	setFixedSize(300, 200);
 	
-	QVBoxLayout audioDeviceLayout;
+	m_centralWidget = new QWidget(this);
+	setCentralWidget(m_centralWidget);
 	
-	m_AudioDeviceLabel = new QLabel("Audio Device", this);
-	m_AudioDeviceCombox = new QComboBox(this);
+	m_audioDeviceLabel = new QLabel("Audio Device", this);
+	m_audioDeviceCombox = new QComboBox(this);
 	
-	audioDeviceLayout.addWidget(m_AudioDeviceLabel);
-	audioDeviceLayout.addWidget(m_AudioDeviceCombox);
+	m_audioDeviceLayout.addWidget(m_audioDeviceLabel, Qt::AlignTop);
+	m_audioDeviceLayout.addWidget(m_audioDeviceCombox, Qt::AlignTop);
+	//m_mainLayout.addLayout(&m_audioDeviceLayout);
+	m_centralWidget->setLayout(&m_audioDeviceLayout);
+	
+	std::vector<std::string> dev;
+	m_audioAdaptor.GetAudioDevices(dev);
+	//connect(m_audioDeviceCombox, SIGNAL(), this, SLOT(
 }
 
 MainWindow::~MainWindow()
 {
+	
 }

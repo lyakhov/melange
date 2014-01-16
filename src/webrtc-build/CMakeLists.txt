@@ -229,7 +229,6 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/g722/g722_decode.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/g711/g711.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/g711/g711_interface.c
-	#${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/opus/opus_interface.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/cng/webrtc_cng.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/pcm16b/pcm16b.c
 	${wrtc_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/abs_quant.c
@@ -497,6 +496,7 @@ include_directories(
 add_definitions(
 	-DWEBRTC_LINUX
 	-DWEBRTC_NS_FLOAT
+	-DLINUX_PULSE
 	-msse2
 	)
 	

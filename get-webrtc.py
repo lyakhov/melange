@@ -55,6 +55,13 @@ def main():
 			print('Revision %d' % revision.number)
 	except pysvn.ClientError as e:
 		print(str(e))
+	try:	
+		#changing names of some source files due to problems with linkage
+		path = './third_party/webrtc/webrtc/modules/audio_coding/codecs/ilbc'
+		os.rename (path+'/encode.c', path+'/ilbc_encode.c')
+		os.rename (path+'/decode.c', path+'/ilbc_decode.c')
+	except os.error as e:
+		print str(e)+". This may cause serious problems during linkage of webrtc."
 	return 0
 
 if __name__ == '__main__':
