@@ -24,9 +24,15 @@ project(melange) # Use CMAKE_PROJECT_NAME to get this name
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/src/cmake)
 
+set(GST_DBUS_STUBS_ROOT ${PROJECT_SOURCE_DIR}/src/gst-dbus-stubs)
 set(GST_AUDIOPLAYER_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer)
 set(GST_AUDIOPLAYER_LOCAL_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer/local)
+set(GST_AUDIOPLAYER_REMOTE_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer/remote)
 set(WRTC_SOFTPHONE_ROOT ${PROJECT_SOURCE_DIR}/src/wrtc-softphone)
 
+set(GST_DBUS_STUBS_OUTPUT gst-dbus-stubs)
+
+add_subdirectory(${GST_DBUS_STUBS_ROOT})
 add_subdirectory(${GST_AUDIOPLAYER_LOCAL_ROOT})
+add_subdirectory(${GST_AUDIOPLAYER_REMOTE_ROOT})
 add_subdirectory(${WRTC_SOFTPHONE_ROOT})
