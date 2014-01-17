@@ -370,6 +370,7 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/latebindingsymboltable_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/audio_mixer_manager_alsa_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/alsasymboltable_linux.cc
+	${wrtc_ROOT}/webrtc/modules/audio_device/linux/pulseaudiosymboltable_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_buffer.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_generic.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_utility.cc
@@ -400,7 +401,6 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/ring_buffer.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/fft4g.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/delay_estimator.c
-	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/ring_buffer_unittest.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/delay_estimator_wrapper.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/audio_processing_impl.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/processing_component.cc
@@ -420,7 +420,6 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/dtmf_queue.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_sender.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_sender_video.cc
-	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/nack_rtx_unittest.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_format_vp8.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/receive_statistics_impl.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/vp8_partition_aggregator.cc
@@ -496,6 +495,7 @@ include_directories(
 add_definitions(
 	-DWEBRTC_LINUX
 	-DWEBRTC_NS_FLOAT
+	-DLINUX_ALSA
 	-DLINUX_PULSE
 	-msse2
 	)

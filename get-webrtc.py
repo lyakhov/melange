@@ -2,6 +2,7 @@
 
 """
 Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
+Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
 
 This file is part of Melange.
 
