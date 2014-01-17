@@ -37,6 +37,10 @@ MainWindow::MainWindow()
 	
 	std::vector<std::string> dev;
 	m_audioAdaptor.GetAudioDevices(dev);
+	for (int i = 0; i < dev.size(); i++)
+	{
+		m_audioDeviceCombox->addItem(dev[i].c_str());
+	}
 	//connect(m_audioDeviceCombox, SIGNAL(), this, SLOT(
 }
 

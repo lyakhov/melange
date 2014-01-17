@@ -370,6 +370,7 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/latebindingsymboltable_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/audio_mixer_manager_alsa_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/linux/alsasymboltable_linux.cc
+	${wrtc_ROOT}/webrtc/modules/audio_device/linux/pulseaudiosymboltable_linux.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_buffer.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_generic.cc
 	${wrtc_ROOT}/webrtc/modules/audio_device/audio_device_utility.cc
@@ -494,6 +495,7 @@ include_directories(
 add_definitions(
 	-DWEBRTC_LINUX
 	-DWEBRTC_NS_FLOAT
+	-DLINUX_ALSA
 	-DLINUX_PULSE
 	-msse2
 	)
