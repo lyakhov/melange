@@ -1,11 +1,11 @@
 # - Try to find the GIO2 framework
 # Once done this will define
 #
-#  GIO2_FOUND - System has GLib
-#  GIO2_INCLUDE_DIRS - The GLib include directories
-#  GIO2_LIBRARIES - The libraries needed to use GLib
-#  GIO2_DEFINITIONS - Compiler switches required for using GLib
-#  GIO2_VERSION_STRING - the version of GLib found
+#  GIO2_FOUND - System has GIO2
+#  GIO2_INCLUDE_DIRS - The GIO2 include directories
+#  GIO2_LIBRARIES - The libraries needed to use GIO2
+#  GIO2_DEFINITIONS - Compiler switches required for using GIO2
+#  GIO2_VERSION_STRING - the version of GIO2 found
 #
 #=============================================================================
 # Copyright 2014 Fedor Lyakhov <fedor.lyakhov@gmail.com>
@@ -89,7 +89,7 @@ set(GIO2_VERSION_STRING ${PC_GIO2_VERSION})
 # handle the QUIETLY and REQUIRED arguments and set GIO2_FOUND to TRUE if
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(GLib2
+find_package_handle_standard_args(GIO2
 	REQUIRED_VARS GIO2_LIBRARIES GIO2_INCLUDE_DIRS
 	VERSION_VAR GIO2_VERSION_STRING)
 
