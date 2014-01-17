@@ -24,7 +24,7 @@ import os, sys, argparse, pysvn
 def default_checkout_path():
 	source_dir_path = os.path.dirname(os.path.abspath(__file__))
 	return os.path.join(source_dir_path,
-		os.path.normcase('third_party/webrtc'))
+		os.path.normcase('third-party/webrtc'))
 
 def get_parser():
 	#Initializes command-line argument parser
@@ -57,7 +57,7 @@ def main():
 		print(str(e))
 	try:	
 		#changing names of some source files due to problems with linkage
-		path = './third_party/webrtc/webrtc/modules/audio_coding/codecs/ilbc'
+		path = './third-party/webrtc/webrtc/modules/audio_coding/codecs/ilbc'
 		os.rename(path + '/encode.c', path + '/ilbc_encode.c')
 		os.rename(path + '/decode.c', path + '/ilbc_decode.c')
 	except os.error as e:

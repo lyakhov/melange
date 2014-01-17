@@ -21,7 +21,7 @@ cmake_minimum_required (VERSION 2.8)
 
 project(wrtcbuild)
 
-set(wrtc_ROOT ${PROJECT_SOURCE_DIR}/../../third_party/webrtc)
+set(wrtc_ROOT ${PROJECT_SOURCE_DIR}/../../third-party/webrtc)
 
 set(wrtc_SOURCES
 	#voice_engine
@@ -400,7 +400,6 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/ring_buffer.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/fft4g.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/delay_estimator.c
-	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/ring_buffer_unittest.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/utility/delay_estimator_wrapper.c
 	${wrtc_ROOT}/webrtc/modules/audio_processing/audio_processing_impl.cc
 	${wrtc_ROOT}/webrtc/modules/audio_processing/processing_component.cc
@@ -420,7 +419,6 @@ set(wrtc_SOURCES
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/dtmf_queue.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_sender.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_sender_video.cc
-	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/nack_rtx_unittest.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/rtp_format_vp8.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/receive_statistics_impl.cc
 	${wrtc_ROOT}/webrtc/modules/rtp_rtcp/source/vp8_partition_aggregator.cc

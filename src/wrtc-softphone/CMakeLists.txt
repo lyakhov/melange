@@ -35,8 +35,8 @@ find_package(Qt4 REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/../../third_party/webrtc/webrtc/voice_engine/include
-	${PROJECT_SOURCE_DIR}/../../third_party/webrtc
+	${PROJECT_SOURCE_DIR}/../../third-party/webrtc/webrtc/voice_engine/include
+	${PROJECT_SOURCE_DIR}/../../third-party/webrtc
 	)
 
 QT4_WRAP_CPP(Application_HEADERS_MOC ${Application_HEADERS})
