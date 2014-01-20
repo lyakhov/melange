@@ -32,4 +32,4 @@ set(SOURCES gst-dbus-stubs.c)
 set(HEADERS gst/gst.h)
 
 add_library(${GST_DBUS_STUBS_OUTPUT} SHARED ${SOURCES} ${HEADERS})
-target_link_libraries(${GST_DBUS_STUBS_OUTPUT} ${GLIB2_LIBRARIES} ${GIO_LIBRARIES})
+target_link_libraries(${GST_DBUS_STUBS_OUTPUT} ${GLIB2_LIBRARIES} ${GIO2_LIBRARIES})
