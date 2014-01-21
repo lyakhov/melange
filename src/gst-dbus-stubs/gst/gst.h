@@ -1,6 +1,7 @@
 /* gst.h: GStreamer API stubs header
  *
  * Copyright 2014 Fedor Lyakhov <fedor.lyakhov@gmail.com>
+ * Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
  *
  * This file is part of Melange.
  *
@@ -62,6 +63,7 @@ typedef enum
 
 #define GST_MESSAGE_CAST(obj)      ((GstMessage*)(obj))
 #define GST_MESSAGE_TYPE(message)  (GST_MESSAGE_CAST(message)->type)
+#define GST_ELEMENT_CAST(obj) ((GstElement*)(obj))
 
 typedef enum {
   GST_STATE_CHANGE_FAILURE    = 0,

@@ -26,15 +26,12 @@
 #include <gio/gio.h>
 #include <string.h>
 
-static gchar *media_file_path;
-
 void gst_message_parse_error(GstMessage *message, GError **gerror, gchar **debug)
 {
 }
 
 void gst_init(int *argc, char **argv[])
 {
-	media_file_path = (gchar *)argv[1];
 }
 
 GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name)
@@ -42,6 +39,7 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 	GDBusProxy *proxy = NULL;
 	GVariant *variant = NULL;
 	GError *error = NULL;
+	gchar *pipeline_object_path = NULL;
 
 	proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
 		G_DBUS_PROXY_FLAGS_NONE,
@@ -52,30 +50,53 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 		NULL,
 		&error);
 
-	if(error)
+	if (error)
 	{
 		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
 		return NULL;
 	}
 
 	variant = NULL;
-
 	variant = g_dbus_proxy_call_sync(proxy,
 		"Create",
-		g_variant_new("(s)", "playbin"), G_DBUS_CALL_FLAGS_NONE,
+		g_variant_new("(s)", "playbin"),
+		G_DBUS_CALL_FLAGS_NONE,
 		-1,
 		NULL,
 		&error);
 
 	if (proxy)
 		g_object_unref(proxy);
-	if(error)
+	if (error)
 	{
 		g_printerr("g_dbus_proxy_call_sync failed: %s\n", error->message);
 		return NULL;
 	}
 
-	return (GstElement*)variant;
+	if (g_variant_is_container(variant) && (g_variant_n_children(variant) == 1))
+	{
+		GVariant *pipeline_variant = g_variant_get_child_value(variant, 0);
+		pipeline_object_path = g_variant_dup_string(pipeline_variant, NULL);
+	}
+
+	error = NULL;
+	proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+		G_DBUS_PROXY_FLAGS_NONE,
+		NULL,
+		"com.ridgerun.gstreamer.gstd",
+		pipeline_object_path,
+		"com.ridgerun.gstreamer.gstd.PipelineInterface",
+		NULL,
+		&error);
+	if (error)
+	{
+		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
+		return NULL;
+	}
+
+	if (pipeline_object_path)
+		g_free(pipeline_object_path);
+	return GST_ELEMENT_CAST(proxy);
 }
 
 GstBus *gst_element_get_bus(GstElement *element)
@@ -98,14 +119,15 @@ gboolean gst_uri_is_valid(const gchar *uri)
 {
 	gchar *endptr;
 
-	g_return_val_if_fail (uri != NULL, FALSE);
+	g_return_val_if_fail(uri != NULL, FALSE);
 
-	gchar *check = (gchar *) uri;
+	gchar *check = (gchar *)uri;
 
-	g_assert (uri != NULL);
-	g_assert (endptr != NULL);
+	g_assert(uri != NULL);
+	g_assert(&endptr != NULL);
 
-	if (g_ascii_isalpha (*check)) {
+	if (g_ascii_isalpha (*check))
+	{
 		check++;
 		while (g_ascii_isalnum (*check) || *check == '+'
 			|| *check == '-' || *check == '.')
@@ -119,9 +141,9 @@ gboolean gst_uri_is_valid(const gchar *uri)
 static gboolean
 file_path_contains_relatives (const gchar * path)
 {
-	return (strstr (path, "/./") != NULL || strstr (path, "/../") != NULL ||
-	strstr (path, G_DIR_SEPARATOR_S "." G_DIR_SEPARATOR_S) != NULL ||
-	strstr (path, G_DIR_SEPARATOR_S ".." G_DIR_SEPARATOR_S) != NULL);
+	return (strstr(path, "/./") != NULL || strstr(path, "/../") != NULL ||
+		strstr(path, G_DIR_SEPARATOR_S "." G_DIR_SEPARATOR_S) != NULL ||
+		strstr(path, G_DIR_SEPARATOR_S ".." G_DIR_SEPARATOR_S) != NULL);
 }
 
 static gchar *
