@@ -20,9 +20,9 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
- *
  */
 #include "gst/gst.h"
+
 #include <gio/gio.h>
 #include <string.h>
 
@@ -94,9 +94,11 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 		return NULL;
 	}
 
+	GstElement *element = g_object_new(GST_TYPE_ELEMENT, NULL);
+
 	if (pipeline_object_path)
 		g_free(pipeline_object_path);
-	return GST_ELEMENT_CAST(proxy);
+	return element;
 }
 
 GstBus *gst_element_get_bus(GstElement *element)

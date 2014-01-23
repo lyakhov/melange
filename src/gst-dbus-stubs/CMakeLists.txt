@@ -25,11 +25,21 @@ project(gst-dbus-stubs)
 find_package(GLib2 REQUIRED)
 find_package(GIO2 REQUIRED)
 
-include_directories(${GLIB2_INCLUDE_DIRS} ${GIO2_INCLUDE_DIRS})
+include_directories(
+	${PROJECT_SOURCE_DIR}
+	${GLIB2_INCLUDE_DIRS}
+	${GIO2_INCLUDE_DIRS}
+	)
 add_definitions(${GLIB2_DEFINITIONS} ${GIO2_DEFINITIONS})
 
-set(SOURCES gst-dbus-stubs.c)
-set(HEADERS gst/gst.h)
+set(SOURCES
+	gst-element-stub.c
+	gst-dbus-stubs.c
+	)
+set(HEADERS
+	gst/gst.h
+	gst-element-stub.h
+	)
 
 add_library(${GST_DBUS_STUBS_OUTPUT} SHARED ${SOURCES} ${HEADERS})
 target_link_libraries(${GST_DBUS_STUBS_OUTPUT} ${GLIB2_LIBRARIES} ${GIO2_LIBRARIES})
