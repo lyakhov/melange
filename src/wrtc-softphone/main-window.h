@@ -19,24 +19,48 @@
  */
 
 #include <QMainWindow>
-#include <QLabel>
 #include <QComboBox>
 #include <QVBoxLayout>
-#include "AudioAdaptor.h"
+#include <QHBoxLayout>
+#include <QFormLayout>
+#include <QPushButton>
+#include <QProgressBar>
+#include <QTimer>
+#include <QLineEdit>
+#include "audio-adaptor.h"
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 	
-	QLabel* m_audioDeviceLabel;
-	QComboBox* m_audioDeviceCombox;
+	QComboBox* m_playoutDeviceCombox;
+	QComboBox* m_recordingDeviceCombox;
 	QWidget* m_centralWidget;
-	QVBoxLayout m_audioDeviceLayout;
+	QFormLayout m_audioDeviceLayout;
 	QVBoxLayout m_mainLayout;
-	
+	QHBoxLayout m_layoutMicTest;
+	QHBoxLayout m_layoutMakeCall;
+	QPushButton* m_pushBtnTestSpeaker;
+	QPushButton* m_pushBtnTestMicrophone;
+	QPushButton* m_pushBtnMakeCall;
+	QLineEdit* m_textEditAddress;
+	QProgressBar* m_barTestMicro;	
 	AudioAdaptor m_audioAdaptor;
+	QTimer* m_timerVolumeCheck;
+	QWidget* m_widgetMicTest;
+	QWidget* m_widgetMakeCall;
+	bool m_bIsMicTesting;
+	bool m_bIsActiveCall;
 	
 public:
 	MainWindow();
 	virtual ~MainWindow();
+	
+public slots:
+	void on_playout_combobox_index_changed(int index);
+	void on_recording_combobox_index_changed(int index);
+	void on_timeout_fired();
+	void on_pushbtn_test_speaker_pressed();
+	void on_pushbtn_test_mic_pressed();
+	void on_pushbtn_make_call_pressed();
 };

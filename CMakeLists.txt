@@ -28,5 +28,7 @@ set(GST_AUDIOPLAYER_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer)
 set(GST_AUDIOPLAYER_LOCAL_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer/local)
 set(WRTC_SOFTPHONE_ROOT ${PROJECT_SOURCE_DIR}/src/wrtc-softphone)
 
+set(WRTC_BUILD_OUTPUT wrtcbuild)
+
 add_subdirectory(${GST_AUDIOPLAYER_LOCAL_ROOT})
 add_subdirectory(${WRTC_SOFTPHONE_ROOT})

@@ -20,6 +20,9 @@
 
 #include "voe_base.h"
 #include "voe_hardware.h"
+#include "voe_network.h"
+#include "voe_volume_control.h"
+#include "voe_file.h"
 #include <string>
 #include <vector>
 
@@ -31,10 +34,25 @@ public:
 	AudioAdaptor();
 	virtual ~AudioAdaptor();
 	
-	void GetAudioDevices(std::vector<std::string> &dev);
+	void GetPlayBackDevices(std::vector<std::string> &dev);
+	void GetRecordingDevices(std::vector<std::string> &dev);
+	void SetPlayoutDevice (std::string &dev);
+	void SetRecordingDevice (std::string &dev);
+	unsigned int GetMicrophoneLevel();
+	void PlayTone();
+	void StartMicTest();
+	void StopMicTest();
+	void MakeCall(std::string & addr);
+	void EndCall();
 	
 private:
 	VoiceEngine* m_VoiceEngine;
 	VoEBase* m_VoEBase;
 	VoEHardware* m_VoEHardware;
+	VoEVolumeControl* m_VoEVolumeControl;
+	VoENetwork* m_VoENetwork;
+	VoEFile* m_VoEFile;
+	
+	int m_TestAudioChannel;
+	int m_audioCallChannel;
 };

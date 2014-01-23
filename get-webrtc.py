@@ -49,7 +49,7 @@ def main():
 		print('Checking out WebRTC...')
 		#check out the current version of the webrtc project
 		svn_client.checkout('http://webrtc.googlecode.com/svn/trunk/',
-			args.checkout_dir)
+			args.checkout_dir, revision=pysvn.Revision(pysvn.opt_revision_kind.number, 3500))
 		#get current revision
 		revision = svn_client.info(args.checkout_dir).revision
 		if revision.kind == pysvn.opt_revision_kind.number:

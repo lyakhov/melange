@@ -20,14 +20,15 @@
 cmake_minimum_required (VERSION 2.8)
 project (wrtc-softphone)
 
-set(Application_HEADERS
-	MainWindow.h
+set(HEADERS
+	main-window.h
+	audio-adaptor.h
 	)
 
-set(Application_SOURCES
+set(SOURCES
 	main.cpp
-	AudioAdaptor.cpp
-	MainWindow.cpp
+	audio-adaptor.cpp
+	main-window.cpp
 	)
 	
 find_package(Qt4 REQUIRED)
@@ -36,15 +37,19 @@ INCLUDE(${QT_USE_FILE})
 
 include_directories(
 	${PROJECT_SOURCE_DIR}/../../third-party/webrtc/webrtc/voice_engine/include
-	${PROJECT_SOURCE_DIR}/../../third-party/webrtc
+	${PROJECT_SOURCE_DIR}/../../third-party/webrtc/webrtc
 	)
 
-QT4_WRAP_CPP(Application_HEADERS_MOC ${Application_HEADERS})
+QT4_WRAP_CPP(HEADERS_MOC ${HEADERS})
 	
-set(WebrtcBuild_ROOT ${PROJECT_SOURCE_DIR}/../webrtc-build)
-add_subdirectory(${WebrtcBuild_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/wrtcbuild")
+set(WEBRTCBUILD_ROOT ${PROJECT_SOURCE_DIR}/../webrtc-build)
+set(WRTC_BUILD_OUTPUT webrtc-build)
 
-add_executable(wrtc-softphone ${Application_SOURCES} ${Application_HEADERS_MOC})
-target_link_libraries(wrtc-softphone ${QT_LIBRARIES} wrtcbuild rt pthread Xext X11 dl resolv)
+add_subdirectory(${WEBRTCBUILD_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/wrtc-build")
 
-add_dependencies(wrtc-softphone wrtcbuild)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS_MOC})
+target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${WRTC_BUILD_OUTPUT} pthread dl)
+
+add_dependencies(${PROJECT_NAME} "${WRTC_BUILD_OUTPUT}")
+
+
