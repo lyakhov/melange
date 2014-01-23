@@ -21,10 +21,44 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "gst/gst.h"
 
 #include <gio/gio.h>
 #include <string.h>
+
+void gst_element_set_remote_property(GObject *object, GParamSpec *pspec, gpointer user_data)
+{
+	GError *error = NULL;
+	GVariant *variant = NULL;
+	GValue new_uri_value = G_VALUE_INIT;
+	gchar *new_uri_string = NULL;
+	GDBusProxy *proxy = G_DBUS_PROXY(user_data);
+
+	if (strcmp(g_param_spec_get_name(pspec), "uri")) {
+		return;
+	}
+
+	g_value_init(&new_uri_value, G_TYPE_STRING);
+	g_object_get_property(object, "uri", &new_uri_value);
+	new_uri_string = g_value_dup_string(&new_uri_value);
+
+	variant = g_dbus_proxy_call_sync(proxy,
+		"ElementSetPropertyString",
+		g_variant_new("(sss)", "plbn", "uri", new_uri_string),
+		G_DBUS_CALL_FLAGS_NONE,
+		-1,
+		NULL,
+		&error);
+	if (error) {
+		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
+		return;
+	}
+
+	g_value_unset(&new_uri_value);
+	g_variant_unref(variant);
+	g_free(new_uri_string);
+}
 
 void gst_message_parse_error(GstMessage *message, GError **gerror, gchar **debug)
 {
@@ -37,6 +71,7 @@ void gst_init(int *argc, char **argv[])
 GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name)
 {
 	GDBusProxy *proxy = NULL;
+	GDBusProxy *pipeline_proxy = NULL;
 	GVariant *variant = NULL;
 	GError *error = NULL;
 	gchar *pipeline_object_path = NULL;
@@ -49,38 +84,36 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 		"com.ridgerun.gstreamer.gstd.FactoryInterface",
 		NULL,
 		&error);
-
-	if (error)
-	{
+	if (error) {
 		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
 		return NULL;
 	}
 
-	variant = NULL;
 	variant = g_dbus_proxy_call_sync(proxy,
 		"Create",
-		g_variant_new("(s)", "playbin"),
+		g_variant_new("(s)", "( playbin name=plbn )"),
 		G_DBUS_CALL_FLAGS_NONE,
 		-1,
 		NULL,
 		&error);
 
-	if (proxy)
-		g_object_unref(proxy);
-	if (error)
-	{
+
+	if (error) {
 		g_printerr("g_dbus_proxy_call_sync failed: %s\n", error->message);
 		return NULL;
 	}
 
-	if (g_variant_is_container(variant) && (g_variant_n_children(variant) == 1))
-	{
+	if (!strcmp(g_variant_get_type_string(variant), "(s)")) {
 		GVariant *pipeline_variant = g_variant_get_child_value(variant, 0);
 		pipeline_object_path = g_variant_dup_string(pipeline_variant, NULL);
 	}
+	else {
+		g_printerr("Received invalid reply on 'Create' remote method.");
+		return NULL;
+	}
 
 	error = NULL;
-	proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+	pipeline_proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
 		G_DBUS_PROXY_FLAGS_NONE,
 		NULL,
 		"com.ridgerun.gstreamer.gstd",
@@ -88,14 +121,19 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 		"com.ridgerun.gstreamer.gstd.PipelineInterface",
 		NULL,
 		&error);
-	if (error)
-	{
+	if (error) {
 		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
 		return NULL;
 	}
 
 	GstElement *element = g_object_new(GST_TYPE_ELEMENT, NULL);
+	g_signal_connect(element,
+		"notify",
+		G_CALLBACK(gst_element_set_remote_property),
+		pipeline_proxy);
 
+	if (proxy)
+		g_object_unref(proxy);
 	if (pipeline_object_path)
 		g_free(pipeline_object_path);
 	return element;

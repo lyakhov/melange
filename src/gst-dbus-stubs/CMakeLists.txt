@@ -39,6 +39,7 @@ set(SOURCES
 set(HEADERS
 	gst/gst.h
 	gst-element-stub.h
+	gst-element-private-stub.h
 	)
 
 add_library(${GST_DBUS_STUBS_OUTPUT} SHARED ${SOURCES} ${HEADERS})

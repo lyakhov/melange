@@ -1,5 +1,4 @@
-/* gst-element-stub.c: Replacement of GstElement object with only one property
- * 'uri' for using in gst-dbus-stubs. Code file.
+/* gst-element-stub.c: Replacement of GstElement object for gst-dbus-stubs. Code file.
  *
  * Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
  *
@@ -20,15 +19,7 @@
  */
 
 #include "gst-element-stub.h"
-
-
-#define GST_ELEMENT_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE((obj),\
-	GST_TYPE_ELEMENT, GstElementPrivate))
-
-struct _GstElementPrivate
-{
-	gchar *uri;
-};
+#include "gst-element-private-stub.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum {
@@ -39,7 +30,7 @@ enum {
 	N_PROPERTIES
 };
 
-static GParamSpec * obj_properties[N_PROPERTIES] = { NULL, };
+static GParamSpec *obj_properties[N_PROPERTIES] = { NULL, };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static void gst_element_set_property(GObject *object,
@@ -92,7 +83,7 @@ static void gst_element_class_init(GstElementClass *klass)
 
 	obj_properties[PROP_URI] = g_param_spec_string("uri",
 		"GstElement URI",
-		"Set GstElement's uri prop",
+		"Set GstElement's uri property",
 		"",
 		G_PARAM_READWRITE);
 

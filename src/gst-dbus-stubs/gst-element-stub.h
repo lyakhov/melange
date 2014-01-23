@@ -1,5 +1,4 @@
-/* gst-element-stub.h: Replacement of GstElement object with only one property
- * 'uri' for using in gst-dbus-stubs. Header file.
+/* gst-element-stub.h: Replacement of GstElement object for gst-dbus-stubs. Header file.
  *
  * Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
  *
@@ -52,5 +51,5 @@ struct _GstElementClass
 
 GType gst_element_get_type();
 
-#endif // __GST_ELEMENT_STUB_H__
+#endif /* __GST_ELEMENT_STUB_H__ */
 
