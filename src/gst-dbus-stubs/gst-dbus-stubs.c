@@ -23,10 +23,26 @@
  */
 
 #include "gst/gst.h"
+#include "gst-element-private-stub.h"
 
 #include <gio/gio.h>
 #include <string.h>
 
+
+void g_signal_eos_received(GDBusProxy *proxy, gchar *sender_name, gchar *signal_name,
+	GVariant *parameters, gpointer user_data)
+{
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void g_signal_error_received(GDBusProxy *proxy, gchar *sender_name, gchar *signal_name,
+	GVariant *parameters, gpointer user_data)
+{
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void gst_element_set_remote_property(GObject *object, GParamSpec *pspec, gpointer user_data)
 {
 	GError *error = NULL;
@@ -60,14 +76,17 @@ void gst_element_set_remote_property(GObject *object, GParamSpec *pspec, gpointe
 	g_free(new_uri_string);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void gst_message_parse_error(GstMessage *message, GError **gerror, gchar **debug)
 {
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void gst_init(int *argc, char **argv[])
 {
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name)
 {
 	GDBusProxy *proxy = NULL;
@@ -127,6 +146,7 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 	}
 
 	GstElement *element = g_object_new(GST_TYPE_ELEMENT, NULL);
+	element->priv->proxy = pipeline_proxy;
 	g_signal_connect(element,
 		"notify",
 		G_CALLBACK(gst_element_set_remote_property),
@@ -139,21 +159,25 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 	return element;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 GstBus *gst_element_get_bus(GstElement *element)
 {
 	return NULL;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 GstStateChangeReturn gst_element_set_state(GstElement *element, GstState state)
 {
 	return GST_STATE_CHANGE_FAILURE;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 guint gst_bus_add_watch(GstBus *bus, GstBusFunc func, gpointer user_data)
 {
 	return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // The following functions were copied from 'gst/gsturi.c' file of GStreamer
 gboolean gst_uri_is_valid(const gchar *uri)
 {
@@ -178,16 +202,16 @@ gboolean gst_uri_is_valid(const gchar *uri)
 	return *endptr == ':';
 }
 
-static gboolean
-file_path_contains_relatives (const gchar * path)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+static gboolean file_path_contains_relatives(const gchar * path)
 {
 	return (strstr(path, "/./") != NULL || strstr(path, "/../") != NULL ||
 		strstr(path, G_DIR_SEPARATOR_S "." G_DIR_SEPARATOR_S) != NULL ||
 		strstr(path, G_DIR_SEPARATOR_S ".." G_DIR_SEPARATOR_S) != NULL);
 }
 
-static gchar *
-gst_file_utils_canonicalise_path (const gchar * path)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+static gchar *gst_file_utils_canonicalise_path(const gchar * path)
 {
 	gchar **parts, **p, *clean_path;
 
@@ -227,6 +251,7 @@ gst_file_utils_canonicalise_path (const gchar * path)
 	return clean_path;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 gchar *gst_filename_to_uri(const gchar *filename, GError **error)
 {
 	gchar *abs_location = NULL;

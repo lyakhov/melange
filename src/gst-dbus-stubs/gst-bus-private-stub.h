@@ -1,4 +1,4 @@
-/* gst-element-private-stub.h: Private structure for GstElement object
+/* gst-bus-private-stub.h: Private structure for GstBus object
  *
  * Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
  *
@@ -18,22 +18,20 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GST_ELEMENT_PRIVATE_STUB_H__
-#define __GST_ELEMENT_PRIVATE_STUB_H__
+#ifndef __GST_BUS_PRIVATE_STUB_H__
+#define __GST_BUS_PRIVATE_STUB_H__
 
-#include <glib.h>
 #include <gio/gio.h>
 
-#define GST_ELEMENT_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE((obj),\
-	GST_TYPE_ELEMENT, GstElementPrivate))
+#define GST_BUS_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE((obj),\
+	GST_TYPE_BUS, GstBusPrivate))
 
-struct _GstElementPrivate
+struct _GstBusPrivate
 {
-	gchar *uri;
 	GDBusProxy *proxy;
 };
 
-void gst_element_set_proxy(GstElement *element, GDBusProxy *proxy);
-GDBusProxy *gst_element_get_proxy(GstElement *element);
+void gst_bus_set_proxy(GstBus *bus, GDBusProxy *proxy);
+GDBusProxy *gst_bus_get_proxy(GstBus *bus);
 
-#endif /* __GST_ELEMENT_PRIVATE_STUB_H__ */
+#endif /* __GST_BUS_PRIVATE_STUB_H__ */

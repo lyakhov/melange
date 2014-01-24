@@ -23,6 +23,7 @@
 #define __GST_H__
 
 #include "gst-element-stub.h"
+#include "gst-bus-stub.h"
 
 #include <glib.h>
 
@@ -85,12 +86,7 @@ typedef enum {
 /* These structs must be GObjects... supporting g_object_unref */
 /* For example, GstElement must be a GObject and support URI property, it is called as
    g_object_set(playbin, "uri", uri, NULL); */
-typedef struct _GstBus GstBus;
 typedef struct _GstMessage GstMessage;
-
-struct _GstBus
-{
-};
 
 struct _GstMessage
 {

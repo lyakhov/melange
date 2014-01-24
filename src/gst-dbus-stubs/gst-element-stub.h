@@ -52,4 +52,3 @@ struct _GstElementClass
 GType gst_element_get_type();
 
 #endif /* __GST_ELEMENT_STUB_H__ */
-

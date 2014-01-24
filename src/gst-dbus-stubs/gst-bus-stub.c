@@ -1,4 +1,4 @@
-/* gst-element-stub.c: Replacement of GstElement object for gst-dbus-stubs. Code file.
+/* gst-bus-stub.h: Replacement of GstBus object for gst-dbus-stubs. Code file.
  *
  * Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
  *
@@ -18,14 +18,12 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gst-element-stub.h"
-#include "gst-element-private-stub.h"
+#include "gst-bus-stub.h"
+#include "gst-bus-private-stub.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum {
 	PROP_0,
-
-	PROP_URI,
 
 	N_PROPERTIES
 };
@@ -33,19 +31,14 @@ enum {
 static GParamSpec *obj_properties[N_PROPERTIES] = { NULL, };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static void gst_element_set_property(GObject *object,
+static void gst_bus_set_property(GObject *object,
 	guint property_id,
 	const GValue *value,
 	GParamSpec *pspec)
 {
-	GstElement *self = GST_ELEMENT(object);
+	GstBus *self = GST_BUS(object);
 
 	switch (property_id) {
-		case PROP_URI:
-			g_free(self->priv->uri);
-			self->priv->uri = g_value_dup_string(value);
-			break;
-
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
 			break;
@@ -53,18 +46,14 @@ static void gst_element_set_property(GObject *object,
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static void gst_element_get_property(GObject *object,
+static void gst_bus_get_property(GObject *object,
 	guint property_id,
 	GValue *value,
 	GParamSpec *pspec)
 {
-	GstElement *self = GST_ELEMENT(object);
+	GstBus *self = GST_BUS(object);
 
 	switch(property_id) {
-		case PROP_URI:
-			g_value_set_string(value, self->priv->uri);
-			break;
-
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
 			break;
@@ -72,43 +61,33 @@ static void gst_element_get_property(GObject *object,
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static void gst_element_class_init(GstElementClass *klass)
+static void gst_bus_class_init(GstBusClass *klass)
 {
-	g_type_class_add_private(klass, sizeof(GstElementPrivate));
+	g_type_class_add_private(klass, sizeof(GstBusPrivate));
 
 	GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-	object_class->set_property = gst_element_set_property;
-	object_class->get_property = gst_element_get_property;
-
-	obj_properties[PROP_URI] = g_param_spec_string("uri",
-		"GstElement URI",
-		"Set GstElement's uri property",
-		"",
-		G_PARAM_READWRITE);
-
-	g_object_class_install_properties(object_class,
-		N_PROPERTIES,
-		obj_properties);
+	object_class->set_property = gst_bus_set_property;
+	object_class->get_property = gst_bus_get_property;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-static void gst_element_init(GstElement *self)
+static void gst_bus_init(GstBus *self)
 {
-	self->priv = GST_ELEMENT_GET_PRIVATE(self);
-	self->priv->uri = NULL;
+	self->priv = GST_BUS_GET_PRIVATE(self);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void gst_element_set_proxy(GstElement *element, GDBusProxy *proxy)
+void gst_bus_set_proxy(GstBus *bus, GDBusProxy *proxy)
 {
-	element->priv->proxy = proxy;
+	bus->priv->proxy = proxy;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-GDBusProxy *gst_element_get_proxy(GstElement *element)
+GDBusProxy *gst_bus_get_proxy(GstBus *bus)
 {
-	return element->priv->proxy;
+	return bus->priv->proxy;
 }
 
-G_DEFINE_TYPE(GstElement, gst_element, G_TYPE_OBJECT)
+G_DEFINE_TYPE(GstBus, gst_bus, G_TYPE_OBJECT)
+

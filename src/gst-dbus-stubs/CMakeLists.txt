@@ -35,11 +35,14 @@ add_definitions(${GLIB2_DEFINITIONS} ${GIO2_DEFINITIONS})
 set(SOURCES
 	gst-element-stub.c
 	gst-dbus-stubs.c
+	gst-bus-stub.c
 	)
 set(HEADERS
 	gst/gst.h
 	gst-element-stub.h
 	gst-element-private-stub.h
+	gst-bus-stub.h
+	gst-bus-private-stub.h
 	)
 
 add_library(${GST_DBUS_STUBS_OUTPUT} SHARED ${SOURCES} ${HEADERS})
