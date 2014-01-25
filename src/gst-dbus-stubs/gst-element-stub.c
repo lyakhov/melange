@@ -20,6 +20,7 @@
 
 #include "gst-element-stub.h"
 #include "gst-element-private-stub.h"
+#include "gstd-factory-interface.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum {
@@ -31,6 +32,8 @@ enum {
 };
 
 static GParamSpec *obj_properties[N_PROPERTIES] = { NULL, };
+
+G_DEFINE_TYPE(GstElement, gst_element, G_TYPE_OBJECT)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static void gst_element_set_property(GObject *object,
@@ -100,15 +103,41 @@ static void gst_element_init(GstElement *self)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+static void gst_element_dispose(GObject *object)
+{
+	GstElement *self = GST_ELEMENT(object);
+
+	if (self->priv->proxy)
+	{
+		GVariant *variant = gstd_factory_destroy(G_BUS_TYPE_SESSION,
+			g_dbus_proxy_get_object_path(self->priv->proxy));
+
+		g_variant_unref(variant);
+		g_object_unref(self->priv->proxy);
+		self->priv->proxy = NULL;
+	}
+
+	G_OBJECT_CLASS(gst_element_parent_class)->dispose(object);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+static void gst_element_finalize(GObject *object)
+{
+	GstElement *self = GST_ELEMENT(object);
+
+	g_free(self->priv->uri);
+
+	G_OBJECT_CLASS(gst_element_parent_class)->finalize(object);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void gst_element_set_proxy(GstElement *element, GDBusProxy *proxy)
 {
-	element->priv->proxy = proxy;
+	element->priv->proxy = g_object_ref(proxy);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 GDBusProxy *gst_element_get_proxy(GstElement *element)
 {
-	return element->priv->proxy;
+	return g_object_ref(element->priv->proxy);
 }
-
-G_DEFINE_TYPE(GstElement, gst_element, G_TYPE_OBJECT)

@@ -36,6 +36,8 @@ set(SOURCES
 	gst-element-stub.c
 	gst-dbus-stubs.c
 	gst-bus-stub.c
+	gstd-factory-interface.c
+	gstd-pipeline-interface.c
 	)
 set(HEADERS
 	gst/gst.h
@@ -43,6 +45,8 @@ set(HEADERS
 	gst-element-private-stub.h
 	gst-bus-stub.h
 	gst-bus-private-stub.h
+	gstd-pipeline-interface.h
+	gstd-factory-interface.h
 	)
 
 add_library(${GST_DBUS_STUBS_OUTPUT} SHARED ${SOURCES} ${HEADERS})

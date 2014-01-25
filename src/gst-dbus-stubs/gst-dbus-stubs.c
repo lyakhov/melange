@@ -24,32 +24,30 @@
 
 #include "gst/gst.h"
 #include "gst-element-private-stub.h"
+#include "gst-bus-private-stub.h"
+#include "gstd-factory-interface.h"
+#include "gstd-pipeline-interface.h"
 
 #include <gio/gio.h>
 #include <string.h>
 
 
-void g_signal_eos_received(GDBusProxy *proxy, gchar *sender_name, gchar *signal_name,
+static void on_pipeline_proxy_signal(GDBusProxy *proxy, gchar *sender_name, gchar *signal_name,
 	GVariant *parameters, gpointer user_data)
 {
+	GstBus *bus = GST_BUS(user_data);
 
+	g_print("Sender name: %s\n", sender_name);
+	g_print("signal name: %s\n", signal_name);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void g_signal_error_received(GDBusProxy *proxy, gchar *sender_name, gchar *signal_name,
-	GVariant *parameters, gpointer user_data)
+static void gst_element_set_remote_property(GObject *object, GParamSpec *pspec, gpointer user_data)
 {
-
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void gst_element_set_remote_property(GObject *object, GParamSpec *pspec, gpointer user_data)
-{
-	GError *error = NULL;
 	GVariant *variant = NULL;
 	GValue new_uri_value = G_VALUE_INIT;
 	gchar *new_uri_string = NULL;
-	GDBusProxy *proxy = G_DBUS_PROXY(user_data);
+	GDBusProxy *proxy = gst_element_get_proxy(GST_ELEMENT(object));
 
 	if (strcmp(g_param_spec_get_name(pspec), "uri")) {
 		return;
@@ -59,20 +57,11 @@ void gst_element_set_remote_property(GObject *object, GParamSpec *pspec, gpointe
 	g_object_get_property(object, "uri", &new_uri_value);
 	new_uri_string = g_value_dup_string(&new_uri_value);
 
-	variant = g_dbus_proxy_call_sync(proxy,
-		"ElementSetPropertyString",
-		g_variant_new("(sss)", "plbn", "uri", new_uri_string),
-		G_DBUS_CALL_FLAGS_NONE,
-		-1,
-		NULL,
-		&error);
-	if (error) {
-		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
-		return;
-	}
+	variant = gstd_pipeline_element_set_property_string(proxy, "plbn", "uri", new_uri_string);
 
 	g_value_unset(&new_uri_value);
 	g_variant_unref(variant);
+	g_object_unref(proxy);
 	g_free(new_uri_string);
 }
 
@@ -89,92 +78,67 @@ void gst_init(int *argc, char **argv[])
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name)
 {
-	GDBusProxy *proxy = NULL;
 	GDBusProxy *pipeline_proxy = NULL;
-	GVariant *variant = NULL;
-	GError *error = NULL;
-	gchar *pipeline_object_path = NULL;
 
-	proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
-		G_DBUS_PROXY_FLAGS_NONE,
-		NULL,
-		"com.ridgerun.gstreamer.gstd",
-		"/com/ridgerun/gstreamer/gstd/factory",
-		"com.ridgerun.gstreamer.gstd.FactoryInterface",
-		NULL,
-		&error);
-	if (error) {
-		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
-		return NULL;
-	}
-
-	variant = g_dbus_proxy_call_sync(proxy,
-		"Create",
-		g_variant_new("(s)", "( playbin name=plbn )"),
-		G_DBUS_CALL_FLAGS_NONE,
-		-1,
-		NULL,
-		&error);
-
-
-	if (error) {
-		g_printerr("g_dbus_proxy_call_sync failed: %s\n", error->message);
-		return NULL;
-	}
-
-	if (!strcmp(g_variant_get_type_string(variant), "(s)")) {
-		GVariant *pipeline_variant = g_variant_get_child_value(variant, 0);
-		pipeline_object_path = g_variant_dup_string(pipeline_variant, NULL);
-	}
-	else {
-		g_printerr("Received invalid reply on 'Create' remote method.");
-		return NULL;
-	}
-
-	error = NULL;
-	pipeline_proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
-		G_DBUS_PROXY_FLAGS_NONE,
-		NULL,
-		"com.ridgerun.gstreamer.gstd",
-		pipeline_object_path,
-		"com.ridgerun.gstreamer.gstd.PipelineInterface",
-		NULL,
-		&error);
-	if (error) {
-		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
-		return NULL;
-	}
+	pipeline_proxy = gstd_factory_create(G_BUS_TYPE_SESSION,
+		g_variant_new("(s)", "( playbin name=plbn )"));
 
 	GstElement *element = g_object_new(GST_TYPE_ELEMENT, NULL);
-	element->priv->proxy = pipeline_proxy;
+	gst_element_set_proxy(element, pipeline_proxy);
+
 	g_signal_connect(element,
 		"notify",
 		G_CALLBACK(gst_element_set_remote_property),
-		pipeline_proxy);
+		NULL);
 
-	if (proxy)
-		g_object_unref(proxy);
-	if (pipeline_object_path)
-		g_free(pipeline_object_path);
+	g_object_unref(pipeline_proxy);
 	return element;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 GstBus *gst_element_get_bus(GstElement *element)
 {
-	return NULL;
+	GstBus *bus = g_object_new(GST_TYPE_BUS, NULL);
+	GDBusProxy *proxy = gst_element_get_proxy(element);
+	gst_bus_set_proxy(bus, proxy);
+
+	g_object_unref(proxy);
+	return bus;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 GstStateChangeReturn gst_element_set_state(GstElement *element, GstState state)
 {
-	return GST_STATE_CHANGE_FAILURE;
+	GVariant *variant = NULL;
+	GDBusProxy *proxy = gst_element_get_proxy(element);
+	GstStateChangeReturn return_state = GST_STATE_CHANGE_FAILURE;
+
+	variant = gstd_pipeline_set_state(proxy, state);
+
+	if (variant) {
+		g_variant_unref(variant);
+		return_state = GST_STATE_CHANGE_SUCCESS;
+	}
+
+	g_object_unref(proxy);
+	return return_state;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 guint gst_bus_add_watch(GstBus *bus, GstBusFunc func, gpointer user_data)
 {
-	return 0;
+	GDBusProxy *proxy = gst_bus_get_proxy(bus);
+
+	// This is temporary solution
+	bus->priv->bus_func = func;
+	bus->priv->user_data = user_data;
+
+	g_signal_connect(proxy,
+		"g-signal",
+		G_CALLBACK(on_pipeline_proxy_signal),
+		g_object_ref(bus));
+
+	g_object_unref(proxy);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

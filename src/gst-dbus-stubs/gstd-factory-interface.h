@@ -1,4 +1,5 @@
-/* gst-bus-private-stub.h: Private structure for GstBus object
+/* gstd-factory-interface.h: Interface to invoke FactoryInterface's methods of gstd.
+ * Header file.
  *
  * Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
  *
@@ -18,23 +19,12 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GST_BUS_PRIVATE_STUB_H__
-#define __GST_BUS_PRIVATE_STUB_H__
+#ifndef __GSTD_FACTORY_INTERFACE_H__
+#define __GSTD_FACTORY_INTERFACE_H__
 
 #include <gio/gio.h>
-#include "gst/gst.h"
 
-#define GST_BUS_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE((obj),\
-	GST_TYPE_BUS, GstBusPrivate))
+GDBusProxy *gstd_factory_create(GBusType gstd_bus_type, GVariant *parameters);
+GVariant *gstd_factory_destroy(GBusType gstd_bus_type, const gchar *object_path);
 
-struct _GstBusPrivate
-{
-	GDBusProxy *proxy;
-	GstBusFunc bus_func;
-	gpointer user_data;
-};
-
-void gst_bus_set_proxy(GstBus *bus, GDBusProxy *proxy);
-GDBusProxy *gst_bus_get_proxy(GstBus *bus);
-
-#endif /* __GST_BUS_PRIVATE_STUB_H__ */
+#endif /* __GSTD_FACTORY_INTERFACE_H__ */

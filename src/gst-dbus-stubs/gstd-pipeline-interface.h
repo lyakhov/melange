@@ -1,4 +1,5 @@
-/* gst-bus-private-stub.h: Private structure for GstBus object
+/* gstd-pipeline-interface.h: Interface to invoke PipelineInterface's methods of gstd.
+ * Header file.
  *
  * Copyright 2014 Alexey Kuzin <amkuzink@gmail.com>
  *
@@ -18,23 +19,24 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GST_BUS_PRIVATE_STUB_H__
-#define __GST_BUS_PRIVATE_STUB_H__
+#ifndef __GSTD_PIPELINE_INTERFACE_H__
+#define __GSTD_PIPELINE_INTERFACE_H__
 
-#include <gio/gio.h>
 #include "gst/gst.h"
 
-#define GST_BUS_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE((obj),\
-	GST_TYPE_BUS, GstBusPrivate))
+#include <gio/gio.h>
 
-struct _GstBusPrivate
-{
-	GDBusProxy *proxy;
-	GstBusFunc bus_func;
-	gpointer user_data;
-};
+GVariant *gstd_pipeline_element_set_property_string(GDBusProxy *pipeline_proxy,
+	const gchar *element,
+	const gchar *name,
+	const gchar *value);
 
-void gst_bus_set_proxy(GstBus *bus, GDBusProxy *proxy);
-GDBusProxy *gst_bus_get_proxy(GstBus *bus);
+gchar *gstd_pipeline_element_get_property_string(GDBusProxy *pipeline_proxy,
+	const gchar *element,
+	const gchar *name);
 
-#endif /* __GST_BUS_PRIVATE_STUB_H__ */
+GVariant *gstd_pipeline_set_state(GDBusProxy *pipeline_proxy, GstState state);
+
+GstState gstd_pipeline_get_state(GDBusProxy *pipeline_proxy);
+
+#endif /* __GSTD_PIPELINE_INTERFACE_H__ */

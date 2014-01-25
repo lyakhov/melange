@@ -30,6 +30,8 @@ enum {
 
 static GParamSpec *obj_properties[N_PROPERTIES] = { NULL, };
 
+G_DEFINE_TYPE(GstBus, gst_bus, G_TYPE_OBJECT)
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 static void gst_bus_set_property(GObject *object,
 	guint property_id,
@@ -78,16 +80,36 @@ static void gst_bus_init(GstBus *self)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+static void gst_bus_dispose(GObject *object)
+{
+	GstBus *self = GST_BUS(object);
+
+	if (self->priv->proxy) {
+		g_object_unref(self->priv->proxy);
+		self->priv->proxy = NULL;
+	}
+
+	if (self->priv->user_data) {
+		self->priv->user_data = NULL;
+	}
+
+	G_OBJECT_CLASS(gst_bus_parent_class)->dispose(object);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+static void gst_bus_finalize(GObject *object)
+{
+	G_OBJECT_CLASS(gst_bus_parent_class)->finalize(object);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void gst_bus_set_proxy(GstBus *bus, GDBusProxy *proxy)
 {
-	bus->priv->proxy = proxy;
+	bus->priv->proxy = g_object_ref(proxy);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 GDBusProxy *gst_bus_get_proxy(GstBus *bus)
 {
-	return bus->priv->proxy;
+	return g_object_ref(bus->priv->proxy);
 }
-
-G_DEFINE_TYPE(GstBus, gst_bus, G_TYPE_OBJECT)
-
