@@ -66,7 +66,7 @@ gchar *gstd_pipeline_element_get_property_string(GDBusProxy *pipeline_proxy,
 		return NULL;
 	}
 
-	if (!strcmp(g_variant_get_type_string(variant), "(sb)")) {
+	if (!g_strcmp0(g_variant_get_type_string(variant), "(sb)")) {
 		GVariant *string_variant = g_variant_get_child_value(variant, 0);
 		property_string = g_variant_dup_string(string_variant, NULL);
 	}
@@ -115,7 +115,7 @@ GstState gstd_pipeline_get_state(GDBusProxy *pipeline_proxy)
 		return GST_STATE_NULL;
 	}
 
-	if (!strcmp(g_variant_get_type_string(variant), "(i)")) {
+	if (!g_strcmp0(g_variant_get_type_string(variant), "(i)")) {
 		GVariant * temp_variant = g_variant_get_child_value(variant, 0);
 		state = g_variant_get_int32(temp_variant);
 		g_variant_unref(temp_variant);

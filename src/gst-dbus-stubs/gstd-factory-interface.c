@@ -39,7 +39,7 @@ GDBusProxy *gstd_factory_create(GBusType gstd_bus_type, GVariant *parameters)
 		&error);
 	if (error) {
 		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
-		return NULL;
+		goto free_section;
 	}
 
 	error = NULL;
@@ -52,16 +52,16 @@ GDBusProxy *gstd_factory_create(GBusType gstd_bus_type, GVariant *parameters)
 		&error);
 	if (error) {
 		g_printerr("g_dbus_proxy_call_sync failed: %s\n", error->message);
-		return NULL;
+		goto free_section;
 	}
 
-	if (!strcmp(g_variant_get_type_string(variant), "(s)")) {
+	if (!g_strcmp0(g_variant_get_type_string(variant), "(s)")) {
 		GVariant *pipeline_variant = g_variant_get_child_value(variant, 0);
 		pipeline_object_path = g_variant_dup_string(pipeline_variant, NULL);
 	}
 	else {
 		g_printerr("Received invalid reply on 'Create' remote method.");
-		return NULL;
+		goto free_section;
 	}
 
 	error = NULL;
@@ -75,9 +75,10 @@ GDBusProxy *gstd_factory_create(GBusType gstd_bus_type, GVariant *parameters)
 		&error);
 	if (error) {
 		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
-		return NULL;
+		goto free_section;
 	}
 
+free_section:
 	g_object_unref(factory_proxy);
 	if (pipeline_object_path)
 		g_free(pipeline_object_path);
@@ -100,7 +101,7 @@ GVariant *gstd_factory_destroy(GBusType gstd_bus_type, const gchar *object_path)
 		&error);
 	if (error) {
 		g_printerr("g_dbus_proxy_new_for_bus_sync failed: %s\n", error->message);
-		return NULL;
+		goto free_section;
 	}
 	else {
 		error = NULL;
@@ -113,10 +114,11 @@ GVariant *gstd_factory_destroy(GBusType gstd_bus_type, const gchar *object_path)
 			&error);
 		if (error) {
 			g_printerr("g_dbus_proxy_call_sync failed: %s\n", error->message);
-			return NULL;
+			goto free_section;
 		}
 	}
 
+free_section:
 	g_object_unref(factory_proxy);
 	return variant;
 }

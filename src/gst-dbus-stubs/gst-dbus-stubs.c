@@ -48,16 +48,13 @@ static void gst_element_set_remote_property(GObject *object, GParamSpec *pspec, 
 	GValue new_uri_value = G_VALUE_INIT;
 	gchar *new_uri_string = NULL;
 	GDBusProxy *proxy = gst_element_get_proxy(GST_ELEMENT(object));
-
-	if (strcmp(g_param_spec_get_name(pspec), "uri")) {
-		return;
-	}
+	const gchar *property_name = g_param_spec_get_name(pspec);
 
 	g_value_init(&new_uri_value, G_TYPE_STRING);
-	g_object_get_property(object, "uri", &new_uri_value);
+	g_object_get_property(object, property_name, &new_uri_value);
 	new_uri_string = g_value_dup_string(&new_uri_value);
 
-	variant = gstd_pipeline_element_set_property_string(proxy, "plbn", "uri", new_uri_string);
+	variant = gstd_pipeline_element_set_property_string(proxy, "plbn", property_name, new_uri_string);
 
 	g_value_unset(&new_uri_value);
 	g_variant_unref(variant);
@@ -79,9 +76,21 @@ void gst_init(int *argc, char **argv[])
 GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name)
 {
 	GDBusProxy *pipeline_proxy = NULL;
+	gchar *parameters_string = NULL;
+
+	if (factoryname) {
+		parameters_string = g_strconcat("( ",
+			factoryname,
+			" name=plbn )"
+			);
+	}
 
 	pipeline_proxy = gstd_factory_create(G_BUS_TYPE_SESSION,
-		g_variant_new("(s)", "( playbin name=plbn )"));
+		g_variant_new("(s)", parameters_string));
+	if (!pipeline_proxy) {
+		g_printerr("gstd_factory_create failed.");
+		return NULL;
+	}
 
 	GstElement *element = g_object_new(GST_TYPE_ELEMENT, NULL);
 	gst_element_set_proxy(element, pipeline_proxy);
