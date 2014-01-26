@@ -81,15 +81,22 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 	if (factoryname) {
 		parameters_string = g_strconcat("( ",
 			factoryname,
-			" name=plbn )"
+			" name=plbn )",
+			NULL
 			);
+	}
+
+	if (!g_utf8_validate(parameters_string, -1, NULL)) {
+		g_printerr("Incorrect factoryname passed.");
+		goto free_section;
 	}
 
 	pipeline_proxy = gstd_factory_create(G_BUS_TYPE_SESSION,
 		g_variant_new("(s)", parameters_string));
+
 	if (!pipeline_proxy) {
 		g_printerr("gstd_factory_create failed.");
-		return NULL;
+		goto free_section;
 	}
 
 	GstElement *element = g_object_new(GST_TYPE_ELEMENT, NULL);
@@ -100,6 +107,9 @@ GstElement *gst_element_factory_make(const gchar *factoryname, const gchar *name
 		G_CALLBACK(gst_element_set_remote_property),
 		NULL);
 
+free_section:
+	if (parameters_string)
+		g_free(parameters_string);
 	g_object_unref(pipeline_proxy);
 	return element;
 }
@@ -255,7 +265,7 @@ gchar *gst_filename_to_uri(const gchar *filename, GError **error)
 
 	/* path is now absolute, but contains '.' or '..' */
 	abs_clean = gst_file_utils_canonicalise_path (abs_location);
-	g_print ("'%s' -> '%s' -> '%s'", filename, abs_location, abs_clean);
+	g_print ("'%s' -> '%s' -> '%s'\n", filename, abs_location, abs_clean);
 	uri = g_filename_to_uri (abs_clean, NULL, error);
 	g_free (abs_clean);
 
