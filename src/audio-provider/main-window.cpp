@@ -1,4 +1,4 @@
-/* MainWindow.cpp
+/* main-window.cpp
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
  *
@@ -20,8 +20,11 @@
 
 #include "main-window.h"
 
+#include <QHBoxLayout>
+#include <QFormLayout>
+
 MainWindow::MainWindow():
-	m_bIsMicTesting(false), m_bIsActiveCall(false)
+ m_bIsMicTesting(false), m_bIsActiveCall(false)
 {
 	setFixedSize(500, 250);
 	
@@ -41,29 +44,30 @@ MainWindow::MainWindow():
 	m_barTestMicro = new QProgressBar (this);
 	m_barTestMicro->setRange(0, 9);
 	
-	m_layoutMicTest.addWidget(m_pushBtnTestMicrophone);
-	m_layoutMicTest.addWidget(m_barTestMicro);
+	QHBoxLayout* layoutMicTest = new QHBoxLayout;
+	layoutMicTest->addWidget(m_pushBtnTestMicrophone);
+	layoutMicTest->addWidget(m_barTestMicro);
 	
-	m_layoutMakeCall.addWidget(m_pushBtnMakeCall);
-	m_layoutMakeCall.addWidget(m_textEditAddress);
+	QHBoxLayout* layoutMakeCall = new QHBoxLayout;
+	layoutMakeCall->addWidget(m_pushBtnMakeCall);
+	layoutMakeCall->addWidget(m_textEditAddress);
 	
-	m_widgetMicTest->setLayout(&m_layoutMicTest);
-	m_widgetMakeCall->setLayout(&m_layoutMakeCall);
+	m_widgetMicTest->setLayout(layoutMicTest);
+	m_widgetMakeCall->setLayout(layoutMakeCall);
 	
 	m_timerVolumeCheck = new QTimer (this);
-	
 	
 	m_playoutDeviceCombox = new QComboBox(this);
 	m_recordingDeviceCombox = new QComboBox(this);
 	
-	m_audioDeviceLayout.addRow("Playout device", m_playoutDeviceCombox);
-	m_audioDeviceLayout.addRow("Recording device", m_recordingDeviceCombox);
-	m_audioDeviceLayout.addRow("Play tone", m_pushBtnTestSpeaker);
-	m_audioDeviceLayout.addRow("Test microphone", m_widgetMicTest);
-	m_audioDeviceLayout.addRow("Make Call", m_widgetMakeCall);
+	QFormLayout* audioDeviceLayout = new QFormLayout;
+	audioDeviceLayout->addRow("Playout device", m_playoutDeviceCombox);
+	audioDeviceLayout->addRow("Recording device", m_recordingDeviceCombox);
+	audioDeviceLayout->addRow("Play tone", m_pushBtnTestSpeaker);
+	audioDeviceLayout->addRow("Test microphone", m_widgetMicTest);
+	audioDeviceLayout->addRow("Make Call", m_widgetMakeCall);
 
-	//m_mainLayout.addLayout(&m_audioDeviceLayout);
-	m_centralWidget->setLayout(&m_audioDeviceLayout);
+	m_centralWidget->setLayout(audioDeviceLayout);
 	
 	std::vector<std::string> playout_dev, recording_dev;
 	m_audioAdaptor.GetPlayBackDevices(playout_dev);
@@ -78,8 +82,10 @@ MainWindow::MainWindow():
 		m_recordingDeviceCombox->addItem(recording_dev[i].c_str());
 	}
 	
-	connect (m_playoutDeviceCombox, SIGNAL(currentIndexChanged(int)), this, SLOT(on_playout_combobox_index_changed(int)));
-	connect (m_recordingDeviceCombox, SIGNAL(currentIndexChanged(int)), this, SLOT(on_recording_combobox_index_changed(int)));
+	connect (m_playoutDeviceCombox, SIGNAL(currentIndexChanged(int)), 
+		this, SLOT(on_playout_combobox_index_changed(int)));
+	connect (m_recordingDeviceCombox, SIGNAL(currentIndexChanged(int)), 
+		this, SLOT(on_recording_combobox_index_changed(int)));
 	connect (m_timerVolumeCheck, SIGNAL(timeout()), this, SLOT(on_timeout_fired()));
 	connect (m_pushBtnTestSpeaker, SIGNAL(pressed()), this, SLOT(on_pushbtn_test_speaker_pressed()));
 	connect (m_pushBtnTestMicrophone, SIGNAL(pressed()), this, SLOT(on_pushbtn_test_mic_pressed()));

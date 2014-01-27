@@ -1,4 +1,4 @@
-/* AudioAdaptor.cpp
+/* vmc-audio-adaptor.cpp
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
  *
@@ -18,19 +18,21 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "audio-adaptor.h"
-#include "iostream"
+#include "remote-audio-provider.h"
+#include "config.h"
 
-AudioAdaptor::AudioAdaptor()
+#include <boost/foreach.hpp>
+#include <boost/thread/locks.hpp>
+#include <boost/weak_ptr.hpp>
+
+using namespace boost;
+
+VMCAudioAdaptor::VMCAudioAdaptor()
 {
 	m_VoiceEngine = VoiceEngine::Create();
-	int err;
 	
 	m_VoEBase = VoEBase::GetInterface(m_VoiceEngine);
-	if (m_VoEBase->Init() != 0)
-	{
-		err = m_VoEBase->LastError();
-	}
+	m_VoEBase->Init();
 	
 	m_VoEHardware = VoEHardware::GetInterface(m_VoiceEngine);
 	m_VoEVolumeControl = VoEVolumeControl::GetInterface(m_VoiceEngine);
@@ -38,43 +40,46 @@ AudioAdaptor::AudioAdaptor()
 	m_VoENetwork = VoENetwork::GetInterface(m_VoiceEngine);
 }
 
-void AudioAdaptor::GetPlayBackDevices(std::vector<std::string> &dev)
-{
-	int number;
-	m_VoEHardware->GetNumOfPlayoutDevices(number);
-	
-	for (int i = 0; i < number; i++)
-	{
-		char strNameUTF8[128];
-		char strGuidUTF8[128];
-		
-		m_VoEHardware->GetPlayoutDeviceName(i, strNameUTF8, strGuidUTF8);
-		dev.push_back(strNameUTF8);
-	}
-}
-
-void AudioAdaptor::GetRecordingDevices(std::vector<std::string> &dev)
+int8_t VMCAudioAdaptor::GetRecordingDeviceNumber()
 {
 	int number;
 	m_VoEHardware->GetNumOfRecordingDevices(number);
-	
-	for (int i = 0; i < number; i++)
-	{
-		char strNameUTF8[128];
-		char strGuidUTF8[128];
-		
-		m_VoEHardware->GetRecordingDeviceName(i, strNameUTF8, strGuidUTF8);
-		dev.push_back(strNameUTF8);
-	}
+	return number;
 }
 
-void AudioAdaptor::SetPlayoutDevice(std::string& dev)
+int8_t VMCAudioAdaptor::GetPlayoutDeviceNumber()
 {
-	std::vector<std::string> vec;
-	GetPlayBackDevices(vec);
-	for (int i = 0; i < vec.size(); i++)
+	int number;
+	m_VoEHardware->GetNumOfPlayoutDevices(number);
+	return number;
+}
+
+void VMCAudioAdaptor::GetPlayoutDeviceName(std::string& _return, const int8_t number)
+{
+	char strNameUTF8[128];
+	char strGuidUTF8[128];
+
+	m_VoEHardware->GetPlayoutDeviceName(number, strNameUTF8, strGuidUTF8);
+	_return = strNameUTF8;
+}
+
+void VMCAudioAdaptor::GetRecordingDeviceName(std::string& _return, const int8_t number)
+{
+	char strNameUTF8[128];
+	char strGuidUTF8[128];
+
+	m_VoEHardware->GetRecordingDeviceName(number, strNameUTF8, strGuidUTF8);
+	_return = strNameUTF8;
+}
+
+void VMCAudioAdaptor::SetPlayoutDevice(const std::string& name)
+{
+	int number = GetPlayoutDeviceNumber();
+	for (int i = 0; i < number; i++)
 	{
-		if (dev == vec[i])
+		std::string device;
+		GetPlayoutDeviceName(device, i);
+		if (device == name)
 		{
 			m_VoEHardware->SetPlayoutDevice(i);
 			break;
@@ -82,13 +87,14 @@ void AudioAdaptor::SetPlayoutDevice(std::string& dev)
 	}
 }
 
-void AudioAdaptor::SetRecordingDevice(std::string& dev)
+void VMCAudioAdaptor::SetRecordingDevice(const std::string& name)
 {
-	std::vector<std::string> vec;
-	GetRecordingDevices(vec);
-	for (int i = 0; i < vec.size(); i++)
+	int number = GetRecordingDeviceNumber();
+	for (int i = 0; i < number; i++)
 	{
-		if (dev == vec[i])
+		std::string device;
+		GetRecordingDeviceName(device, i);
+		if (device == name)
 		{
 			m_VoEHardware->SetRecordingDevice(i);
 			break;
@@ -96,23 +102,14 @@ void AudioAdaptor::SetRecordingDevice(std::string& dev)
 	}
 }
 
-unsigned int AudioAdaptor::GetMicrophoneLevel()
+int8_t VMCAudioAdaptor::GetSpeechInputLevel()
 {
-	unsigned int lev;
-	m_VoEVolumeControl->GetSpeechInputLevel(lev);
-	return lev;
+	unsigned int volume;
+	m_VoEVolumeControl->GetSpeechInputLevel(volume);
+	return volume;
 }
 
-void AudioAdaptor::PlayTone()
-{
-	m_TestAudioChannel = m_VoEBase->CreateChannel();
-	const char tone[1024] = "tone.wav";
-	
-	m_VoEBase->StartPlayout(m_TestAudioChannel);
-	m_VoEFile->StartPlayingFileLocally(m_TestAudioChannel, tone);
-}
-
-void AudioAdaptor::StartMicTest()
+void VMCAudioAdaptor::StartMicTest()
 {
 	class MicTest : public OutStream
 	{
@@ -128,12 +125,23 @@ void AudioAdaptor::StartMicTest()
 	m_VoEFile->StartRecordingMicrophone(&test);
 }
 
-void AudioAdaptor::StopMicTest()
+void VMCAudioAdaptor::StopMicTest()
 {
 	m_VoEFile->StopRecordingMicrophone();
 }
 
-void AudioAdaptor::MakeCall(std::string & addr)
+void VMCAudioAdaptor::PlayTone()
+{
+	m_TestAudioChannel = m_VoEBase->CreateChannel();
+	char tone[1024] = "\0";
+	strcat(tone, PATH_TO_AUDIO_FILE);
+	strcat(tone, "/tone.wav");
+	
+	m_VoEBase->StartPlayout(m_TestAudioChannel);
+	m_VoEFile->StartPlayingFileLocally(m_TestAudioChannel, tone);
+}
+
+void VMCAudioAdaptor::MakeCall(const std::string& address)
 {
 	m_audioCallChannel = m_VoEBase->CreateChannel();
 	
@@ -152,7 +160,7 @@ void AudioAdaptor::MakeCall(std::string & addr)
 		std::cout << "Error StartPlayout " << m_VoEBase->LastError();
 	}
 	
-	if (m_VoEBase->SetSendDestination(m_audioCallChannel, 55555, addr.c_str()) != 0)
+	if (m_VoEBase->SetSendDestination(m_audioCallChannel, 55555, address.c_str()) != 0)
 	{
 		std::cout << "Error SetSendDestination " << m_VoEBase->LastError();
 	}
@@ -163,7 +171,7 @@ void AudioAdaptor::MakeCall(std::string & addr)
 	}
 }
 
-void AudioAdaptor::EndCall()
+void VMCAudioAdaptor::EndCall()
 {
 	if (m_VoEBase->StopPlayout(m_audioCallChannel) != 0)
 	{
@@ -183,14 +191,7 @@ void AudioAdaptor::EndCall()
 	m_VoEBase->DeleteChannel(m_audioCallChannel);
 }
 
-AudioAdaptor::~AudioAdaptor()
+VMCAudioAdaptor::~VMCAudioAdaptor()
 {
-	m_VoEBase->DeleteChannel(m_TestAudioChannel);
-	m_VoEHardware->Release();
-	m_VoEVolumeControl->Release();
-	m_VoEFile->Release();
-	m_VoENetwork->Release();
-	m_VoEBase->Terminate();
-	
-	VoiceEngine::Delete(m_VoiceEngine);
+
 }

@@ -19,8 +19,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-set(WRTC_ROOT ${PROJECT_SOURCE_DIR}/../../third-party/webrtc)
-
 set(SOURCES
 	#voice_engine
 	${WRTC_ROOT}/webrtc/voice_engine/channel.cc
@@ -445,7 +443,7 @@ set(SOURCES
 	
 include_directories(
 	${WRTC_ROOT}
-	${WRTC_ROOT}/webrtc/
+	${WRTC_ROOT}/webrtc
 	${WRTC_ROOT}/webrtc/common_audio/signal_processing/include
 	${WRTC_ROOT}/webrtc/modules/audio_coding/neteq/interface
 	${WRTC_ROOT}/webrtc/modules/audio_coding/codecs/cng/include
@@ -458,11 +456,9 @@ include_directories(
 	${WRTC_ROOT}/webrtc/modules/audio_coding/codecs/isac/main/interface
 	${WRTC_ROOT}/webrtc/modules/audio_coding/codecs/ilbc/interface
 	${WRTC_ROOT}/webrtc/modules/audio_device/linux
-	${WRTC_ROOT}/testing/gtest/include
-	${WRTC_ROOT}/testing/gtest/
-	${WRTC_ROOT}/webrtc/modules/interface/
+	${WRTC_ROOT}/webrtc/modules/interface
 	${WRTC_ROOT}/webrtc/system_wrappers/interface
-	${WRTC_ROOT}/webrtc/modules/utility/interface/	
+	${WRTC_ROOT}/webrtc/modules/utility/interface
 	${WRTC_ROOT}/webrtc/common_audio/resampler/include
 	${WRTC_ROOT}/webrtc/modules/audio_device/main/interface
 	${WRTC_ROOT}/webrtc/modules/rtp_rtcp/interface
@@ -478,6 +474,7 @@ include_directories(
 	${WRTC_ROOT}/webrtc/modules/audio_processing/aecm/include
 	${WRTC_ROOT}/webrtc/common_audio/vad/include
 	${WRTC_ROOT}/webrtc/system_wrappers/source/spreadsortlib
+	${WRTC_ROOT}/webrtc/voice_engine/include
 	)
 	
 add_definitions(

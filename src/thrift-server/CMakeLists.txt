@@ -1,4 +1,4 @@
-# Top-level CMakeLists.txt for wrtc-softphone
+# CMakeLists.txt for thrift-server
 #
 # Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
 #
@@ -18,38 +18,37 @@
 # along with Melange.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required (VERSION 2.8)
-project (wrtc-softphone)
-
-set(HEADERS
-	main-window.h
-	audio-adaptor.h
-	)
 
 set(SOURCES
-	main.cpp
-	audio-adaptor.cpp
-	main-window.cpp
+	server.cpp
+	remote-audio-provider.cpp
+	${THRIFT_GEN_ROOT}/AudioAdaptor.cpp
 	)
-	
-find_package(Qt4 REQUIRED)
 
-INCLUDE(${QT_USE_FILE})
+set(Boost_USE_STATIC_LIBS     ON)
+set(Boost_USE_MULTITHREADED   ON)
+set(Boost_USE_STATIC_RUNTIME  OFF)
+
+set(BOOST_COMPONENTS system)
+find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+
+set(LIBRARIES
+	${Boost_LIBRARIES}
+	${WRTC_BUILD_OUTPUT}
+	pthread
+	thrift
+	dl
+	)
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/../../third-party/webrtc/webrtc/voice_engine/include
-	${PROJECT_SOURCE_DIR}/../../third-party/webrtc/webrtc
+	${THRIFT_GEN_ROOT}
+	${WRTC_SOFTPHONE_ROOT}
+	${PROJECT_BINARY_DIR}
+	${WRTC_ROOT}/webrtc/voice_engine/include
+	${WRTC_ROOT}/webrtc
 	)
 
-QT4_WRAP_CPP(HEADERS_MOC ${HEADERS})
-	
-set(WEBRTCBUILD_ROOT ${PROJECT_SOURCE_DIR}/../webrtc-build)
-set(WRTC_BUILD_OUTPUT webrtc-build)
-
-add_subdirectory(${WEBRTCBUILD_ROOT} "${CMAKE_CURRENT_BINARY_DIR}/wrtc-build")
-
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS_MOC})
-target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${WRTC_BUILD_OUTPUT} pthread dl)
-
-add_dependencies(${PROJECT_NAME} "${WRTC_BUILD_OUTPUT}")
-
+add_executable(${THRIFT_SERVER_OUTPUT} ${SOURCES})
+target_link_libraries(${THRIFT_SERVER_OUTPUT} ${LIBRARIES})
+add_dependencies(${THRIFT_SERVER_OUTPUT} ${WRTC_BUILD_OUTPUT})
 

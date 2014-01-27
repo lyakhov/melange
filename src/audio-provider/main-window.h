@@ -1,4 +1,4 @@
-/* MainWindow.h
+/* main-window.h
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
  *
@@ -20,14 +20,11 @@
 
 #include <QMainWindow>
 #include <QComboBox>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QFormLayout>
 #include <QPushButton>
 #include <QProgressBar>
 #include <QTimer>
 #include <QLineEdit>
-#include "audio-adaptor.h"
+#include "audio-provider.h"
 
 class MainWindow : public QMainWindow
 {
@@ -36,19 +33,17 @@ class MainWindow : public QMainWindow
 	QComboBox* m_playoutDeviceCombox;
 	QComboBox* m_recordingDeviceCombox;
 	QWidget* m_centralWidget;
-	QFormLayout m_audioDeviceLayout;
-	QVBoxLayout m_mainLayout;
-	QHBoxLayout m_layoutMicTest;
-	QHBoxLayout m_layoutMakeCall;
 	QPushButton* m_pushBtnTestSpeaker;
 	QPushButton* m_pushBtnTestMicrophone;
 	QPushButton* m_pushBtnMakeCall;
 	QLineEdit* m_textEditAddress;
 	QProgressBar* m_barTestMicro;	
-	AudioAdaptor m_audioAdaptor;
 	QTimer* m_timerVolumeCheck;
 	QWidget* m_widgetMicTest;
 	QWidget* m_widgetMakeCall;
+	
+	AudioAdaptor m_audioAdaptor;
+	
 	bool m_bIsMicTesting;
 	bool m_bIsActiveCall;
 	

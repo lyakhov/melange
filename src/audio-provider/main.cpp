@@ -26,7 +26,6 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 	
-	AudioAdaptor adaptor;
 	MainWindow mainwindow;
 	mainwindow.show();
 	app.exec();

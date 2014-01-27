@@ -1,4 +1,4 @@
-/* AudioAdaptor.h
+/* remote-audio-provider.h
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
  *
@@ -18,41 +18,49 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AudioAdaptor.h"
+#include "vmc_types.h"
+
 #include "voe_base.h"
 #include "voe_hardware.h"
 #include "voe_network.h"
 #include "voe_volume_control.h"
 #include "voe_file.h"
-#include <string>
-#include <vector>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 using namespace webrtc;
 
-class AudioAdaptor
+class VMCAudioAdaptor : public AudioAdaptorIf
 {
 public:
-	AudioAdaptor();
-	virtual ~AudioAdaptor();
+	VMCAudioAdaptor();
 	
-	void GetPlayBackDevices(std::vector<std::string> &dev);
-	void GetRecordingDevices(std::vector<std::string> &dev);
-	void SetPlayoutDevice (std::string &dev);
-	void SetRecordingDevice (std::string &dev);
-	unsigned int GetMicrophoneLevel();
-	void PlayTone();
+	int8_t GetPlayoutDeviceNumber();
+	int8_t GetRecordingDeviceNumber();
+	void GetPlayoutDeviceName(std::string& _return, const int8_t number);
+	void GetRecordingDeviceName(std::string& _return, const int8_t number);
+	void SetPlayoutDevice(const std::string& name);
+	void SetRecordingDevice(const std::string& name);
+	int8_t GetSpeechInputLevel();
 	void StartMicTest();
 	void StopMicTest();
-	void MakeCall(std::string & addr);
+	void PlayTone();
+	void MakeCall(const std::string& address);
 	void EndCall();
 	
+	virtual ~VMCAudioAdaptor();
+	
 private:
+	int m_TestAudioChannel;
+	int m_audioCallChannel;
+	
 	VoiceEngine* m_VoiceEngine;
 	VoEBase* m_VoEBase;
 	VoEHardware* m_VoEHardware;
 	VoEVolumeControl* m_VoEVolumeControl;
 	VoENetwork* m_VoENetwork;
 	VoEFile* m_VoEFile;
-	
-	int m_TestAudioChannel;
-	int m_audioCallChannel;
 };

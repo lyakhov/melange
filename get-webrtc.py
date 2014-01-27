@@ -47,7 +47,8 @@ def main():
 
 	try:
 		print('Checking out WebRTC...')
-		#check out the current version of the webrtc project
+		#check out the revision 3500 of webrtc project, because it's one of the latest
+		#revisions that has important interface functions in voe_base.h
 		svn_client.checkout('http://webrtc.googlecode.com/svn/trunk/',
 			args.checkout_dir, revision=pysvn.Revision(pysvn.opt_revision_kind.number, 3500))
 		#get current revision

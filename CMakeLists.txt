@@ -28,14 +28,30 @@ set(GST_DBUS_STUBS_ROOT ${PROJECT_SOURCE_DIR}/src/gst-dbus-stubs)
 set(GST_AUDIOPLAYER_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer)
 set(GST_AUDIOPLAYER_LOCAL_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer/local)
 set(GST_AUDIOPLAYER_REMOTE_ROOT ${PROJECT_SOURCE_DIR}/src/gst-audioplayer/remote)
-set(WRTC_SOFTPHONE_ROOT ${PROJECT_SOURCE_DIR}/src/wrtc-softphone)
+set(AUDIO_PROVIDER_ROOT ${PROJECT_SOURCE_DIR}/src/audio-provider)
+set(AUDIO_PROVIDER_WRTC_ROOT ${PROJECT_SOURCE_DIR}/src/audio-provider/wrtc)
+set(AUDIO_PROVIDER_THRIFT_ROOT ${PROJECT_SOURCE_DIR}/src/audio-provider/thrift)
+set(WRTC_ENGINE_ROOT ${PROJECT_SOURCE_DIR}/src/webrtc-engine)
+set(WRTC_ROOT ${PROJECT_SOURCE_DIR}/third-party/webrtc)
+set(THRIFT_GEN_ROOT ${PROJECT_SOURCE_DIR}/third-party/thrift/gen)
+set(THRIFT_SERVER_ROOT ${PROJECT_SOURCE_DIR}/src/thrift-server)
+set(RESOURCES_ROOT ${PROJECT_SOURCE_DIR}/resources)
 
+configure_file(
+	"${PROJECT_SOURCE_DIR}/config.h.in"
+	"${PROJECT_BINARY_DIR}/config.h"
+	)
 
-set(WRTC_BUILD_OUTPUT wrtcbuild)
+set(WRTC_BUILD_OUTPUT webrtc-engine)
+set(THRIFT_SERVER_OUTPUT thrift-server)
+set(AUDIO_PROVIDER_WRTC_OUTPUT audio-provider-wrtc)
+set(AUDIO_PROVIDER_THRIFT_OUTPUT audio-provider-thrift)
 set(GST_DBUS_STUBS_OUTPUT gst-dbus-stubs)
 
 add_subdirectory(${GST_DBUS_STUBS_ROOT})
 add_subdirectory(${GST_AUDIOPLAYER_LOCAL_ROOT})
 add_subdirectory(${GST_AUDIOPLAYER_REMOTE_ROOT})
-add_subdirectory(${WRTC_SOFTPHONE_ROOT})
-
+add_subdirectory(${AUDIO_PROVIDER_WRTC_ROOT})
+add_subdirectory(${AUDIO_PROVIDER_THRIFT_ROOT})
+add_subdirectory(${WRTC_ENGINE_ROOT})
+add_subdirectory(${THRIFT_SERVER_ROOT})
