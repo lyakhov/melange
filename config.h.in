@@ -18,4 +18,4 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define PATH_TO_AUDIO_FILE "${RESOURCES_ROOT}/audio"
+#define AUDIO_RESOURCES_ROOT "@AUDIO_RESOURCES_ROOT@"

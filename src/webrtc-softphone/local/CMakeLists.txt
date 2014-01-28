@@ -1,4 +1,4 @@
-# CMakeLists.txt for thrift-server
+# CMakeLists.txt for local audio provider
 #
 # Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
 #
@@ -18,37 +18,34 @@
 # along with Melange.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required (VERSION 2.8)
+project(webrtc-softphone-local)
 
-set(SOURCES
-	server.cpp
-	vmc-audio-adaptor.cpp
-	${THRIFT_GEN_ROOT}/AudioAdaptor.cpp
+set(HEADERS
+	../main-window.h
 	)
 
-set(Boost_USE_STATIC_LIBS     ON)
-set(Boost_USE_MULTITHREADED   ON)
-set(Boost_USE_STATIC_RUNTIME  OFF)
+set(SOURCES
+	../main.cpp
+	../main-window.cpp
+	)
 
-set(BOOST_COMPONENTS system)
-find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+include(${QT_USE_FILE})
 
-set(LIBRARIES
-	${Boost_LIBRARIES}
-	${WRTC_BUILD_OUTPUT}
+include_directories(
+	${WEBRTC_AUDIO_PROVIDER_ROOT}
+	${PROJECT_BINARY_DIR}
+	)
+	
+set(LIBRARIES 
+	${QT_LIBRARIES}
+	${WEBRTC_ENGINE_OUTPUT}
+	${WEBRTC_AUDIO_PROVIDER_OUTPUT}
 	pthread
-	thrift
 	dl
 	)
 
-include_directories(
-	${THRIFT_GEN_ROOT}
-	${WRTC_SOFTPHONE_ROOT}
-	${PROJECT_BINARY_DIR}
-	${WRTC_ROOT}/webrtc/voice_engine/include
-	${WRTC_ROOT}/webrtc
-	)
+qt4_wrap_cpp(HEADERS_MOC ${HEADERS})
 
-add_executable(${THRIFT_SERVER_OUTPUT} ${SOURCES})
-target_link_libraries(${THRIFT_SERVER_OUTPUT} ${LIBRARIES})
-add_dependencies(${THRIFT_SERVER_OUTPUT} ${WRTC_BUILD_OUTPUT})
-
+add_executable(${WEBRTC_SOFTPHONE_LOCAL_OUTPUT} ${SOURCES} ${HEADERS_MOC})
+target_link_libraries(${WEBRTC_SOFTPHONE_LOCAL_OUTPUT} ${LIBRARIES})

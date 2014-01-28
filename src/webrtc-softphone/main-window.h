@@ -18,13 +18,14 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "webrtc-audio-provider.h"
+
 #include <QMainWindow>
 #include <QComboBox>
 #include <QPushButton>
 #include <QProgressBar>
 #include <QTimer>
 #include <QLineEdit>
-#include "audio-provider.h"
 
 class MainWindow : public QMainWindow
 {
@@ -42,7 +43,7 @@ class MainWindow : public QMainWindow
 	QWidget* m_widgetMicTest;
 	QWidget* m_widgetMakeCall;
 	
-	AudioAdaptor m_audioAdaptor;
+	WebRtcAudioProvider m_AudioProvider;
 	
 	bool m_bIsMicTesting;
 	bool m_bIsActiveCall;

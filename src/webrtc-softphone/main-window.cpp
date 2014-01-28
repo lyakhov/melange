@@ -39,9 +39,9 @@ MainWindow::MainWindow():
 	m_pushBtnMakeCall = new QPushButton ("Make Call", this);
 	m_pushBtnTestSpeaker->setFixedSize(60,30);
 	
-	m_textEditAddress = new QLineEdit (this);
+	m_textEditAddress = new QLineEdit(this);
 	
-	m_barTestMicro = new QProgressBar (this);
+	m_barTestMicro = new QProgressBar(this);
 	m_barTestMicro->setRange(0, 9);
 	
 	QHBoxLayout* layoutMicTest = new QHBoxLayout;
@@ -55,7 +55,7 @@ MainWindow::MainWindow():
 	m_widgetMicTest->setLayout(layoutMicTest);
 	m_widgetMakeCall->setLayout(layoutMakeCall);
 	
-	m_timerVolumeCheck = new QTimer (this);
+	m_timerVolumeCheck = new QTimer(this);
 	
 	m_playoutDeviceCombox = new QComboBox(this);
 	m_recordingDeviceCombox = new QComboBox(this);
@@ -70,13 +70,13 @@ MainWindow::MainWindow():
 	m_centralWidget->setLayout(audioDeviceLayout);
 	
 	std::vector<std::string> playout_dev, recording_dev;
-	m_audioAdaptor.GetPlayBackDevices(playout_dev);
+	m_AudioProvider.get_playout_devices(playout_dev);
 	for (int i = 0; i < playout_dev.size(); i++)
 	{
 		m_playoutDeviceCombox->addItem(playout_dev[i].c_str());
 	}
 	
-	m_audioAdaptor.GetRecordingDevices(recording_dev);
+	m_AudioProvider.get_recording_devices(recording_dev);
 	for (int i = 0; i < recording_dev.size(); i++)
 	{
 		m_recordingDeviceCombox->addItem(recording_dev[i].c_str());
@@ -95,23 +95,23 @@ MainWindow::MainWindow():
 void MainWindow::on_playout_combobox_index_changed(int index)
 {
 	std::string dev = m_playoutDeviceCombox->currentText().toStdString();
-	m_audioAdaptor.SetPlayoutDevice(dev);
+	m_AudioProvider.set_playout_device(dev);
 }
 
 void MainWindow::on_recording_combobox_index_changed(int index)
 {
 	std::string dev = m_recordingDeviceCombox->currentText().toStdString();
-	m_audioAdaptor.SetRecordingDevice(dev);
+	m_AudioProvider.set_recording_device(dev);
 }
 
 void MainWindow::on_timeout_fired()
 {
-	m_barTestMicro->setValue(m_audioAdaptor.GetMicrophoneLevel());
+	m_barTestMicro->setValue(m_AudioProvider.get_speech_input_level());
 }
 
 void MainWindow::on_pushbtn_test_speaker_pressed()
 {
-	m_audioAdaptor.PlayTone();
+	m_AudioProvider.play_tone();
 }
 
 void MainWindow::on_pushbtn_test_mic_pressed()
@@ -120,14 +120,14 @@ void MainWindow::on_pushbtn_test_mic_pressed()
 	{
 		m_timerVolumeCheck->stop();
 		m_pushBtnTestMicrophone->setText("Start");
-		m_audioAdaptor.StopMicTest();
+		m_AudioProvider.stop_recording_device_test();
 		m_barTestMicro->setValue(0);
 	}
 	else
 	{
 		m_timerVolumeCheck->start(100);
 		m_pushBtnTestMicrophone->setText("Stop");
-		m_audioAdaptor.StartMicTest();
+		m_AudioProvider.start_recording_device_test();
 	}
 	m_bIsMicTesting = !m_bIsMicTesting;
 }
@@ -136,14 +136,14 @@ void MainWindow::on_pushbtn_make_call_pressed()
 {
 	if (m_bIsActiveCall)
 	{
-		m_audioAdaptor.EndCall();
+		m_AudioProvider.end_call();
 		m_pushBtnMakeCall->setText("Make Call");
 		m_bIsActiveCall = false;
 	}
 	else
 	{
 		std::string addr = m_textEditAddress->text().toStdString();
-		m_audioAdaptor.MakeCall(addr);
+		m_AudioProvider.make_call(addr);
 		m_pushBtnMakeCall->setText("End Call");
 		m_bIsActiveCall = true;
 	}
@@ -151,5 +151,4 @@ void MainWindow::on_pushbtn_make_call_pressed()
 
 MainWindow::~MainWindow()
 {
-	
 }

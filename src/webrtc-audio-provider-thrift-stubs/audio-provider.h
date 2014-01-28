@@ -1,4 +1,4 @@
-/* dummy-audio-adaptor.h
+/* audio-provider.h
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
  *
@@ -32,11 +32,11 @@
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
 
-class AudioAdaptor
+class AudioProvider
 {
 public:
-	AudioAdaptor();
-	virtual ~AudioAdaptor();
+	AudioProvider();
+	virtual ~AudioProvider();
 	
 	void GetPlayBackDevices(std::vector<std::string> &dev);
 	void GetRecordingDevices(std::vector<std::string> &dev);

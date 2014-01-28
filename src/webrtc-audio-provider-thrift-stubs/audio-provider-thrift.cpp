@@ -1,4 +1,4 @@
-/* dummy-audio-adaptor.cpp
+/* audio-provider-thrift.cpp
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
  *
@@ -21,20 +21,20 @@
 #include "audio-provider.h"
 #include <iostream>
 
-AudioAdaptor::AudioAdaptor()
+AudioProvider::AudioProvider()
 {
 	if (m_VmcTransport.get())
 	{
 		m_VmcTransport->close();
 	}
-	m_VmcSocket.reset(new TSocket("localhost", 9090));
+	m_VmcSocket.reset(new TSocket("192.168.127.23", 9090));
 	m_VmcTransport.reset(new TBufferedTransport(m_VmcSocket));
 	m_VmcProtocol.reset(new TBinaryProtocol(m_VmcTransport));
 	m_VmcAudioClient.reset(new AudioAdaptorClient(m_VmcProtocol));
 	m_VmcTransport->open();
 }
 
-void AudioAdaptor::GetPlayBackDevices(std::vector<std::string> &dev)
+void AudioProvider::GetPlayBackDevices(std::vector<std::string> &dev)
 {
 	int number = m_VmcAudioClient->GetPlayoutDeviceNumber();
 	
@@ -47,7 +47,7 @@ void AudioAdaptor::GetPlayBackDevices(std::vector<std::string> &dev)
 	}
 }
 
-void AudioAdaptor::GetRecordingDevices(std::vector<std::string> &dev)
+void AudioProvider::GetRecordingDevices(std::vector<std::string> &dev)
 {
 	int number = m_VmcAudioClient->GetRecordingDeviceNumber();
 	
@@ -60,47 +60,47 @@ void AudioAdaptor::GetRecordingDevices(std::vector<std::string> &dev)
 	}
 }
 
-void AudioAdaptor::SetPlayoutDevice(const std::string &dev)
+void AudioProvider::SetPlayoutDevice(const std::string &dev)
 {
 	m_VmcAudioClient->SetPlayoutDevice(dev);
 }
 
-void AudioAdaptor::SetRecordingDevice(const std::string &dev)
+void AudioProvider::SetRecordingDevice(const std::string &dev)
 {
 	m_VmcAudioClient->SetRecordingDevice(dev);
 }
 
-unsigned int AudioAdaptor::GetMicrophoneLevel()
+unsigned int AudioProvider::GetMicrophoneLevel()
 {
 	return m_VmcAudioClient->GetSpeechInputLevel();
 }
 
-void AudioAdaptor::PlayTone()
+void AudioProvider::PlayTone()
 {
 	m_VmcAudioClient->PlayTone();
 }
 
-void AudioAdaptor::StartMicTest()
+void AudioProvider::StartMicTest()
 {
 	m_VmcAudioClient->StartMicTest();
 }
 
-void AudioAdaptor::StopMicTest()
+void AudioProvider::StopMicTest()
 {
 	m_VmcAudioClient->StopMicTest();
 }
 
-void AudioAdaptor::MakeCall(std::string &addr)
+void AudioProvider::MakeCall(std::string &addr)
 {
 	m_VmcAudioClient->MakeCall(addr);
 }
 
-void AudioAdaptor::EndCall()
+void AudioProvider::EndCall()
 {
 	m_VmcAudioClient->EndCall();
 }
 
-AudioAdaptor::~AudioAdaptor()
+AudioProvider::~AudioProvider()
 {
 
 }

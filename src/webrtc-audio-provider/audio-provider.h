@@ -1,6 +1,7 @@
 /* audio-provider.h
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
+ * Copyright 2014 Fedor Lyakhov <fedor.lyakhov@gmail.com>
  *
  * This file is part of Melange.
  *
@@ -18,41 +19,29 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "voe_base.h"
-#include "voe_hardware.h"
-#include "voe_network.h"
-#include "voe_volume_control.h"
-#include "voe_file.h"
+#ifndef __AUDIO_PROVIDER_H__
+#define __AUDIO_PROVIDER_H__
+
 #include <string>
 #include <vector>
 
-using namespace webrtc;
-
-class AudioAdaptor
+class AudioProvider
 {
 public:
-	AudioAdaptor();
-	virtual ~AudioAdaptor();
+	virtual ~AudioProvider() {};
 	
-	void GetPlayBackDevices(std::vector<std::string> &dev);
-	void GetRecordingDevices(std::vector<std::string> &dev);
-	void SetPlayoutDevice(const std::string &dev);
-	void SetRecordingDevice(const std::string &dev);
-	unsigned int GetMicrophoneLevel();
-	void PlayTone();
-	void StartMicTest();
-	void StopMicTest();
-	void MakeCall(std::string &addr);
-	void EndCall();
-	
-private:
-	VoiceEngine* m_VoiceEngine;
-	VoEBase* m_VoEBase;
-	VoEHardware* m_VoEHardware;
-	VoEVolumeControl* m_VoEVolumeControl;
-	VoENetwork* m_VoENetwork;
-	VoEFile* m_VoEFile;
-	
-	int m_TestAudioChannel;
-	int m_audioCallChannel;
+	virtual void get_playout_devices(std::vector<std::string> &dev) = 0;
+	virtual void get_recording_devices(std::vector<std::string> &dev) = 0;
+	virtual void set_playout_device(const std::string &dev) = 0;
+	virtual void set_recording_device(const std::string &dev) = 0;
+
+	virtual void play_tone() = 0;
+	virtual unsigned int get_speech_input_level() = 0;
+	virtual void start_recording_device_test() = 0;
+	virtual void stop_recording_device_test() = 0;
+
+	virtual void make_call(std::string &addr) = 0;
+	virtual void end_call() = 0;
 };
+
+#endif // __AUDIO_PROVIDER_H__

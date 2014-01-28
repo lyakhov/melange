@@ -1,6 +1,7 @@
-# CMakeLists.txt for local audio provider
+# CMakeLists.txt for local WebRTC Audio Provider
 #
 # Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
+# Copyright 2014 Fedor Lyakhov <fedor.lyakhov@gmail.com>
 #
 # This file is part of Melange.
 #
@@ -18,38 +19,22 @@
 # along with Melange.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required (VERSION 2.8)
+project(webrtc-audio-provider)
 
-set(HEADERS
-	../main-window.h
-	)
-
-set(SOURCES
-	../main.cpp
-	../main-window.cpp
-	audio-provider-wrtc.cpp
-	)
-
-find_package(Qt4 REQUIRED)
-
-INCLUDE(${QT_USE_FILE})
+set(HEADERS webrtc-audio-provider.h)
+set(SOURCES webrtc-audio-provider.cpp)
 
 include_directories(
-	${WRTC_ROOT}/webrtc/voice_engine/include
-	${WRTC_ROOT}/webrtc
-	${AUDIO_PROVIDER_WRTC_ROOT}
-	${PROJECT_BINARY_DIR}
+	${WEBRTC_ROOT}/webrtc/voice_engine/include
+	${WEBRTC_ROOT}/webrtc
+	${CMAKE_BINARY_DIR}
 	)
-	
+
 set(LIBRARIES 
-	${QT_LIBRARIES}
-	${WRTC_BUILD_OUTPUT}
+	${WEBRTC_ENGINE_OUTPUT}
 	pthread
 	dl
 	)
 
-QT4_WRAP_CPP(HEADERS_MOC ${HEADERS})
-
-add_executable(${AUDIO_PROVIDER_WRTC_OUTPUT} ${SOURCES} ${HEADERS_MOC})
-target_link_libraries(${AUDIO_PROVIDER_WRTC_OUTPUT} ${LIBRARIES})
-add_dependencies(${AUDIO_PROVIDER_WRTC_OUTPUT} ${WRTC_BUILD_OUTPUT})
-
+add_library(${WEBRTC_AUDIO_PROVIDER_OUTPUT} STATIC ${SOURCES})
+target_link_libraries(${WEBRTC_AUDIO_PROVIDER_OUTPUT} ${LIBRARIES})
