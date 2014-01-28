@@ -113,7 +113,7 @@ void AudioAdaptor::PlayTone()
 	strcat(tone, "/tone.wav");
 	
 	m_VoEBase->StartPlayout(m_TestAudioChannel);
-	m_VoEFile->StartPlayingFileLocally(m_TestAudioChannel, tone);
+	m_VoEFile->StartPlayingFileLocally(m_TestAudioChannel, tone, false, kFileFormatWavFile);
 }
 
 void AudioAdaptor::StartMicTest()
