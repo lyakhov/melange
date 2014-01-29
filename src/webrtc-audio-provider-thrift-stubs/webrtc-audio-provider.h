@@ -1,4 +1,4 @@
-/* audio-provider.h
+/* webrtc-audio-provider.h
  *
  * Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
  *
@@ -27,31 +27,33 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "AudioAdaptor.h"
+#include "AudioProvider.h"
 
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
 
-class AudioProvider
+class WebRtcAudioProvider
 {
 public:
-	AudioProvider();
-	virtual ~AudioProvider();
+	WebRtcAudioProvider();
+	virtual ~WebRtcAudioProvider();
 	
-	void GetPlayBackDevices(std::vector<std::string> &dev);
-	void GetRecordingDevices(std::vector<std::string> &dev);
-	void SetPlayoutDevice(const std::string &dev);
-	void SetRecordingDevice(const std::string &dev);
-	unsigned int GetMicrophoneLevel();
-	void PlayTone();
-	void StartMicTest();
-	void StopMicTest();
-	void MakeCall(std::string &addr);
-	void EndCall();
+	virtual void get_playout_devices(std::vector<std::string> &dev);
+	virtual void get_recording_devices(std::vector<std::string> &dev);
+	virtual void set_playout_device(const std::string &dev);
+	virtual void set_recording_device(const std::string &dev);
+
+	virtual void play_tone();
+	virtual unsigned int get_speech_input_level();
+	virtual void start_recording_device_test();
+	virtual void stop_recording_device_test();
+
+	virtual void make_call(std::string &addr);
+	virtual void end_call();
 	
 private:
-	boost::shared_ptr<TSocket> m_VmcSocket;
-	boost::shared_ptr<TBufferedTransport> m_VmcTransport;
-	boost::shared_ptr<TBinaryProtocol> m_VmcProtocol;
-	boost::shared_ptr<AudioAdaptorClient> m_VmcAudioClient;
+	boost::shared_ptr<TSocket> m_ThriftSocket;
+	boost::shared_ptr<TBufferedTransport> m_ThriftTransport;
+	boost::shared_ptr<TBinaryProtocol> m_ThriftProtocol;
+	boost::shared_ptr<AudioProviderClient> m_ThriftAudioClient;
 };

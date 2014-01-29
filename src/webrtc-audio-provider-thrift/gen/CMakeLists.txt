@@ -1,4 +1,4 @@
-# CMakeLists.txt for remote audio provider using thrift
+# CMakeLists.txt for generated thrift audio provider
 #
 # Copyright 2014 Yegor Mazur <yegor.mazur@gmail.com>
 #
@@ -19,17 +19,9 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-set(SOURCES webrtc-audio-provider-thrift-stubs.cpp)
-
-include_directories(
-	${WEBRTC_AUDIO_PROVIDER_THRIFT_GEN_ROOT}
-	)
-	
-set(LIBRARIES 
-	${WEBRTC_AUDIO_PROVIDER_THRIFT_GEN_OUTPUT}
-	thrift
+set(SOURCES
+	AudioProvider.cpp
 	)
 
-add_library(${WEBRTC_AUDIO_PROVIDER_THRIFT_STUBS_OUTPUT} ${SOURCES})
-target_link_libraries(${WEBRTC_AUDIO_PROVIDER_THRIFT_STUBS_OUTPUT} ${LIBRARIES})
+add_library(${WEBRTC_AUDIO_PROVIDER_THRIFT_GEN_OUTPUT} ${SOURCES})
 

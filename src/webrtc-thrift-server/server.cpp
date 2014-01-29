@@ -34,8 +34,8 @@ using namespace apache::thrift::server;
 int main(int argc, char *argv[])
 {
 	boost::shared_ptr<TBinaryProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
-	boost::shared_ptr<VMCAudioAdaptor> handler(new VMCAudioAdaptor());
-	boost::shared_ptr<AudioAdaptorProcessor> processor(new AudioAdaptorProcessor(handler));
+	boost::shared_ptr<WebRtcAudioProviderThrift> handler(new WebRtcAudioProviderThrift());
+	boost::shared_ptr<AudioProviderProcessor> processor(new AudioProviderProcessor(handler));
 	boost::shared_ptr<TServerSocket> serverTransport(new TServerSocket(9090));
 	boost::shared_ptr<TBufferedTransportFactory> transportFactory(new TBufferedTransportFactory());
   

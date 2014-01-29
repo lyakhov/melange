@@ -22,7 +22,6 @@ cmake_minimum_required (VERSION 2.8)
 set(SOURCES
 	server.cpp
 	remote-audio-provider.cpp
-	${THRIFT_GEN_ROOT}/AudioAdaptor.cpp
 	)
 
 set(Boost_USE_STATIC_LIBS     ON)
@@ -34,21 +33,17 @@ find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 
 set(LIBRARIES
 	${Boost_LIBRARIES}
-	${WRTC_BUILD_OUTPUT}
-	pthread
+	${WEBRTC_AUDIO_PROVIDER_THRIFT_GEN_OUTPUT}
+	${WEBRTC_AUDIO_PROVIDER_OUTPUT}
 	thrift
-	dl
 	)
 
 include_directories(
-	${THRIFT_GEN_ROOT}
-	${WRTC_SOFTPHONE_ROOT}
-	${PROJECT_BINARY_DIR}
-	${WRTC_ROOT}/webrtc/voice_engine/include
-	${WRTC_ROOT}/webrtc
+	${WEBRTC_AUDIO_PROVIDER_THRIFT_GEN_ROOT}
+	${WEBRTC_AUDIO_PROVIDER_ROOT}
+	${CMAKE_BINARY_DIR}
 	)
 
-add_executable(${THRIFT_SERVER_OUTPUT} ${SOURCES})
-target_link_libraries(${THRIFT_SERVER_OUTPUT} ${LIBRARIES})
-add_dependencies(${THRIFT_SERVER_OUTPUT} ${WRTC_BUILD_OUTPUT})
+add_executable(${WEBRTC_THRIFT_SERVER_OUTPUT} ${SOURCES})
+target_link_libraries(${WEBRTC_THRIFT_SERVER_OUTPUT} ${LIBRARIES})
 

@@ -168,7 +168,7 @@ void WebRtcAudioProvider::stop_recording_device_test()
 	m_pVoEFile->StopRecordingMicrophone();
 }
 
-void WebRtcAudioProvider::make_call(std::string &addr)
+void WebRtcAudioProvider::make_call(const std::string &addr)
 {
 	m_AudioCallChannel = m_pVoEBase->CreateChannel();
 	

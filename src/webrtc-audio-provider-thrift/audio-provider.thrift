@@ -19,29 +19,25 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-service AudioAdaptor {
+service AudioProvider {
 	
-	byte GetPlayoutDeviceNumber(),
-	
-	byte GetRecordingDeviceNumber(),
-	
-	string GetPlayoutDeviceName(1:byte number),
+	list<string> get_playout_devices(),
 
-	string GetRecordingDeviceName(1:byte number),
+	list<string> get_recording_devices(),
 	
-	void SetPlayoutDevice(1:string name),
+	void set_playout_device(1:string name),
 	
-	void SetRecordingDevice(1:string name),
+	void set_recording_device(1:string name),
 	
-	byte GetSpeechInputLevel(),
+	byte get_speech_input_level(),
 	
-	void StartMicTest(),
+	void start_mic_test(),
 	
-	void StopMicTest(),
+	void stop_mic_test(),
 	
-	void PlayTone(),
+	void play_tone(),
 	
-	void MakeCall(1:string address),
+	void make_call(1:string address),
 	
-	void EndCall(),
+	void end_call(),
 }

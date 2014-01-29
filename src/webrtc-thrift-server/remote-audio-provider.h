@@ -18,14 +18,8 @@
  * along with Melange. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AudioAdaptor.h"
-#include "vmc_types.h"
-
-#include "voe_base.h"
-#include "voe_hardware.h"
-#include "voe_network.h"
-#include "voe_volume_control.h"
-#include "voe_file.h"
+#include "AudioProvider.h"
+#include "webrtc-audio-provider.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -33,34 +27,23 @@
 
 using namespace webrtc;
 
-class VMCAudioAdaptor : public AudioAdaptorIf
+class WebRtcAudioProviderThrift : public AudioProviderIf
 {
 public:
-	VMCAudioAdaptor();
-	
-	int8_t GetPlayoutDeviceNumber();
-	int8_t GetRecordingDeviceNumber();
-	void GetPlayoutDeviceName(std::string& _return, const int8_t number);
-	void GetRecordingDeviceName(std::string& _return, const int8_t number);
-	void SetPlayoutDevice(const std::string& name);
-	void SetRecordingDevice(const std::string& name);
-	int8_t GetSpeechInputLevel();
-	void StartMicTest();
-	void StopMicTest();
-	void PlayTone();
-	void MakeCall(const std::string& address);
-	void EndCall();
-	
-	virtual ~VMCAudioAdaptor();
+	WebRtcAudioProviderThrift();
+	void get_playout_devices(std::vector<std::string> & _return);
+	void get_recording_devices(std::vector<std::string> & _return);
+	void set_playout_device(const std::string& name);
+	void set_recording_device(const std::string& name);
+	int8_t get_speech_input_level();
+	void start_mic_test();
+	void stop_mic_test();
+	void play_tone();
+	void make_call(const std::string& address);
+	void end_call();
+	virtual ~WebRtcAudioProviderThrift();
 	
 private:
-	int m_TestAudioChannel;
-	int m_audioCallChannel;
+	WebRtcAudioProvider m_audioProvider;
 	
-	VoiceEngine* m_VoiceEngine;
-	VoEBase* m_VoEBase;
-	VoEHardware* m_VoEHardware;
-	VoEVolumeControl* m_VoEVolumeControl;
-	VoENetwork* m_VoENetwork;
-	VoEFile* m_VoEFile;
 };

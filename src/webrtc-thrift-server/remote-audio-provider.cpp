@@ -27,171 +27,63 @@
 
 using namespace boost;
 
-VMCAudioAdaptor::VMCAudioAdaptor()
+WebRtcAudioProviderThrift::WebRtcAudioProviderThrift()
 {
-	m_VoiceEngine = VoiceEngine::Create();
-	
-	m_VoEBase = VoEBase::GetInterface(m_VoiceEngine);
-	m_VoEBase->Init();
-	
-	m_VoEHardware = VoEHardware::GetInterface(m_VoiceEngine);
-	m_VoEVolumeControl = VoEVolumeControl::GetInterface(m_VoiceEngine);
-	m_VoEFile = VoEFile::GetInterface(m_VoiceEngine);
-	m_VoENetwork = VoENetwork::GetInterface(m_VoiceEngine);
 }
 
-int8_t VMCAudioAdaptor::GetRecordingDeviceNumber()
+void WebRtcAudioProviderThrift::get_playout_devices(std::vector< std::string >& _return)
 {
-	int number;
-	m_VoEHardware->GetNumOfRecordingDevices(number);
-	return number;
+
+	m_audioProvider.get_playout_devices(_return);
 }
 
-int8_t VMCAudioAdaptor::GetPlayoutDeviceNumber()
+void WebRtcAudioProviderThrift::get_recording_devices(std::vector< std::string >& _return)
 {
-	int number;
-	m_VoEHardware->GetNumOfPlayoutDevices(number);
-	return number;
+
+	m_audioProvider.get_recording_devices(_return);
 }
 
-void VMCAudioAdaptor::GetPlayoutDeviceName(std::string& _return, const int8_t number)
+void WebRtcAudioProviderThrift::set_playout_device(const std::string& name)
 {
-	char strNameUTF8[128];
-	char strGuidUTF8[128];
-
-	m_VoEHardware->GetPlayoutDeviceName(number, strNameUTF8, strGuidUTF8);
-	_return = strNameUTF8;
+	m_audioProvider.set_playout_device(name);
 }
 
-void VMCAudioAdaptor::GetRecordingDeviceName(std::string& _return, const int8_t number)
+void WebRtcAudioProviderThrift::set_recording_device(const std::string& name)
 {
-	char strNameUTF8[128];
-	char strGuidUTF8[128];
-
-	m_VoEHardware->GetRecordingDeviceName(number, strNameUTF8, strGuidUTF8);
-	_return = strNameUTF8;
+	m_audioProvider.set_recording_device(name);
 }
 
-void VMCAudioAdaptor::SetPlayoutDevice(const std::string& name)
+int8_t WebRtcAudioProviderThrift::get_speech_input_level()
 {
-	int number = GetPlayoutDeviceNumber();
-	for (int i = 0; i < number; i++)
-	{
-		std::string device;
-		GetPlayoutDeviceName(device, i);
-		if (device == name)
-		{
-			m_VoEHardware->SetPlayoutDevice(i);
-			break;
-		}
-	}
+	return m_audioProvider.get_speech_input_level();
 }
 
-void VMCAudioAdaptor::SetRecordingDevice(const std::string& name)
+void WebRtcAudioProviderThrift::start_mic_test()
 {
-	int number = GetRecordingDeviceNumber();
-	for (int i = 0; i < number; i++)
-	{
-		std::string device;
-		GetRecordingDeviceName(device, i);
-		if (device == name)
-		{
-			m_VoEHardware->SetRecordingDevice(i);
-			break;
-		}
-	}
+	m_audioProvider.start_recording_device_test();
 }
 
-int8_t VMCAudioAdaptor::GetSpeechInputLevel()
+void WebRtcAudioProviderThrift::stop_mic_test()
 {
-	unsigned int volume;
-	m_VoEVolumeControl->GetSpeechInputLevel(volume);
-	return volume;
+	m_audioProvider.stop_recording_device_test();
 }
 
-void VMCAudioAdaptor::StartMicTest()
+void WebRtcAudioProviderThrift::play_tone()
 {
-	class MicTest : public OutStream
-	{
-	public:
-		bool Write(const void *buf,int len) 
-		{
-			return true;
-		};
-	};
-	
-	static MicTest test;
-	
-	m_VoEFile->StartRecordingMicrophone(&test);
+	m_audioProvider.play_tone();
 }
 
-void VMCAudioAdaptor::StopMicTest()
+void WebRtcAudioProviderThrift::make_call(const std::string& address)
 {
-	m_VoEFile->StopRecordingMicrophone();
+	m_audioProvider.make_call(address);
 }
 
-void VMCAudioAdaptor::PlayTone()
+void WebRtcAudioProviderThrift::end_call()
 {
-	m_TestAudioChannel = m_VoEBase->CreateChannel();
-	char tone[1024] = "\0";
-	strcat(tone, PATH_TO_AUDIO_FILE);
-	strcat(tone, "/tone.wav");
-	
-	m_VoEBase->StartPlayout(m_TestAudioChannel);
-	m_VoEFile->StartPlayingFileLocally(m_TestAudioChannel, tone, false, kFileFormatWavFile);
+	m_audioProvider.end_call();
 }
 
-void VMCAudioAdaptor::MakeCall(const std::string& address)
-{
-	m_audioCallChannel = m_VoEBase->CreateChannel();
-	
-	if (m_VoEBase->SetLocalReceiver(m_audioCallChannel, 55555) != 0)
-	{
-		std::cout << "Error SetLocalReceiver " << m_VoEBase->LastError();
-	}
-	
-	if (m_VoEBase->StartReceive(m_audioCallChannel) != 0)
-	{
-		std::cout << "Error StartReceive " << m_VoEBase->LastError();
-	}
-	
-	if (m_VoEBase->StartPlayout(m_audioCallChannel) != 0)
-	{
-		std::cout << "Error StartPlayout " << m_VoEBase->LastError();
-	}
-	
-	if (m_VoEBase->SetSendDestination(m_audioCallChannel, 55555, address.c_str()) != 0)
-	{
-		std::cout << "Error SetSendDestination " << m_VoEBase->LastError();
-	}
-	
-	if (m_VoEBase->StartSend(m_audioCallChannel) != 0)
-	{
-		std::cout << "Error StartSend " << m_VoEBase->LastError();
-	}
-}
-
-void VMCAudioAdaptor::EndCall()
-{
-	if (m_VoEBase->StopPlayout(m_audioCallChannel) != 0)
-	{
-		std::cout << "Error StopPlayout " << m_VoEBase->LastError();
-	}
-	
-	if (m_VoEBase->StopSend(m_audioCallChannel) != 0)
-	{
-		std::cout << "Error StopSend " << m_VoEBase->LastError();
-	}
-	
-	if (m_VoEBase->StopReceive(m_audioCallChannel) != 0)
-	{
-		std::cout << "Error StopReceive " << m_VoEBase->LastError();
-	}
-	
-	m_VoEBase->DeleteChannel(m_audioCallChannel);
-}
-
-VMCAudioAdaptor::~VMCAudioAdaptor()
+WebRtcAudioProviderThrift::~WebRtcAudioProviderThrift()
 {
 
 }

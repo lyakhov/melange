@@ -32,7 +32,7 @@ namespace webrtc {
 	class VoEFile;
 }
 
-class WebRtcAudioProvider : public AudioProvider
+class WebRtcAudioProvider
 {
 public:
 	WebRtcAudioProvider();
@@ -48,7 +48,7 @@ public:
 	virtual void start_recording_device_test();
 	virtual void stop_recording_device_test();
 
-	virtual void make_call(std::string &addr);
+	virtual void make_call(const std::string &addr);
 	virtual void end_call();
 
 private:

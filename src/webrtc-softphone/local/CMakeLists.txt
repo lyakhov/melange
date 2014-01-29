@@ -34,15 +34,11 @@ include(${QT_USE_FILE})
 
 include_directories(
 	${WEBRTC_AUDIO_PROVIDER_ROOT}
-	${PROJECT_BINARY_DIR}
 	)
 	
 set(LIBRARIES 
 	${QT_LIBRARIES}
-	${WEBRTC_ENGINE_OUTPUT}
 	${WEBRTC_AUDIO_PROVIDER_OUTPUT}
-	pthread
-	dl
 	)
 
 qt4_wrap_cpp(HEADERS_MOC ${HEADERS})
